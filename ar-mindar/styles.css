@@ -29,15 +29,62 @@ button {
   justify-content: center;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   transform: translate(-50%, -50%) scale(1.05);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
   background-color: #000;
 }
 
-button:active {
+button:active:not(:disabled) {
   transform: translate(-50%, -50%) scale(0.95);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+/*
+   NUEVOS ESTILOS SIMPLES "para cerrar y Ayuda" 
+*/
+
+/* Estilo para cuando el boton de inicio esta bloqueado cargando */
+button:disabled {
+  background-color: #555;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Boton de la esquina superior derecha para cerrar */
+#closeButton {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  left: auto;
+  /* esto quita el centrado del boton original */
+  transform: none;
+  /* esto quita el centrado del boton original */
+  width: auto;
+  height: auto;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  /* bordes normales, no un circulo */
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  z-index: 100;
+}
+
+/* Texto flotante abajo en el medio */
+#ar-hint {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* para que este justo en el medio */
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  z-index: 100;
 }
 
 /* 

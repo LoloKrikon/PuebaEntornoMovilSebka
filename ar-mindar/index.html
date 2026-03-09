@@ -17,7 +17,14 @@
 
 <body>
 
-  <button id="playButton">Iniciar</button>
+  <!-- Botón principal, empieza apagado hasta que cargue el vídeo -->
+  <button id="playButton" disabled>Cargando...</button>
+
+  <!-- Botón para cerrar la cámara sin tener que recargar la página -->
+  <button id="closeButton" style="display: none;">Cerrar AR</button>
+
+  <!-- Mensaje de ayuda para el usuario -->
+  <div id="ar-hint" style="display: none;">📷 Apunta la cámara a la imagen</div>
 
   <a-scene id="target" mindar-image="imageTargetSrc:Mark/targets.mind;filterMinCF: 0.0001;" embedded
     renderer="colorManagement: true, physicallyCorrectLights, logarithmicDepthBuffer: true;" vr-mode-ui="enabled: false"
