@@ -37,6 +37,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function mostrarErrorCamara(err) {
     console.error('Error al iniciar AR:', err);
     alert(" No se ha podido acceder a la cámara.\n\nPor favor, asegúrate de haber dado permiso cuando el navegador te lo pida o revisa la configuración de privacidad de tu dispositivo.");
+
+    // Ocultar cualquier pantalla de carga que se haya quedado enganchada
+    const overlays = document.querySelectorAll('.mindar-ui-overlay');
+    overlays.forEach(overlay => overlay.style.display = 'none');
+
     playButton.style.display = 'block'; // Volver a mostrar el botón
     video.pause();
   }
