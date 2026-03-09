@@ -1,0 +1,9 @@
+# Carpeta del proyecto original del compañero (ya no se usa)
+ar-mindar/
+
+# Capturas de pantalla
+*.png
+
+# Sistema
+.DS_Store
+Thumbs.db
