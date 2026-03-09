@@ -14,16 +14,32 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Start mindar system when available
-    if (sceneEl && sceneEl.systems && sceneEl.systems['mindar-image-system']) {
-      sceneEl.systems['mindar-image-system'].start();
-    } else if (sceneEl) {
-      sceneEl.addEventListener('renderstart', () => {
-        if (sceneEl.systems && sceneEl.systems['mindar-image-system']) {
-          sceneEl.systems['mindar-image-system'].start();
-        }
-      }, { once: true });
+    try {
+      if (sceneEl && sceneEl.systems && sceneEl.systems['mindar-image-system']) {
+        await sceneEl.systems['mindar-image-system'].start();
+      } else if (sceneEl) {
+        sceneEl.addEventListener('renderstart', async () => {
+          try {
+            if (sceneEl.systems && sceneEl.systems['mindar-image-system']) {
+              await sceneEl.systems['mindar-image-system'].start();
+            }
+          } catch (err) {
+            mostrarErrorCamara(err);
+          }
+        }, { once: true });
+      }
+    } catch (err) {
+      mostrarErrorCamara(err);
     }
   });
+
+  // Mostrar alerta si falla la cámara o se deniegan los permisos
+  function mostrarErrorCamara(err) {
+    console.error('Error al iniciar AR:', err);
+    alert(" No se ha podido acceder a la cámara.\n\nPor favor, asegúrate de haber dado permiso cuando el navegador te lo pida o revisa la configuración de privacidad de tu dispositivo.");
+    playButton.style.display = 'block'; // Volver a mostrar el botón
+    video.pause();
+  }
 
   // Attach target found/lost handlers when marker entity is ready
   const marker = document.getElementById('marker');
