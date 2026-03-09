@@ -1,7 +1,3 @@
-# Experiencia AR Sebka
-
-Este proyecto es una aplicación web de Realidad Aumentada (WebXR) que utiliza la cámara del dispositivo móvil para detectar una imagen específica (target) y reproducir un vídeo con un efecto de croma (fondo transparente) superpuesto sobre ella en el mundo real.
-
 ## Herramientas Utilizadas
 - **A-Frame (v1.5.0):** Para renderizar la escena en 3D y colocar el vídeo en un plano.
 - **MindAR (v1.1.5):** Motor de seguimiento de imágenes para activar la cámara del dispositivo y detectar cuándo aparece la imagen `Enara.png`.

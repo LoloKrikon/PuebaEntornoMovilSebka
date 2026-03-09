@@ -95,10 +95,11 @@ document.addEventListener("DOMContentLoaded", function () {
 /*
 --- codigo muerto ---
 la funcion no se llama desde ningun sitio en el HTML ni en el resto del js.
-Probablemente se usaba para pruebas.
+Probablemente se usaba para pruebas
  
 function apagado(){
   const v = document.getElementById('alpha');
   if (v) { v.pause(); v.muted = true; }
 }
 */
+
