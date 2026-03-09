@@ -1,85 +1,80 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const startBtn = document.getElementById('start-ar-btn');
-    const stopBtn = document.getElementById('stop-ar-btn');
-    const landing = document.getElementById('landing');
-    const arContainer = document.getElementById('ar-container');
-    const arScene = document.getElementById('ar-scene');
-    const marker = document.getElementById('marker');
-    const arHint = document.getElementById('ar-hint');
-    const loadingStatus = document.getElementById('loading-status');
-    const btnText = startBtn.querySelector('.btn-ar-text');
+    var startBtn = document.getElementById('start-ar-btn');
+    var stopBtn = document.getElementById('stop-ar-btn');
+    var landing = document.getElementById('landing');
+    var arContainer = document.getElementById('ar-container');
+    var scene = document.getElementById('ar-scene');
+    var marker = document.getElementById('marker');
+    var hint = document.getElementById('ar-hint');
+    var status = document.getElementById('loading-status');
+    var btnText = startBtn.querySelector('.btn-ar-text');
+    var video = document.getElementById('ar-video');
+    var started = false;
 
-    let arStarted = false;
-
-    // Wait for A-Frame assets to finish loading
-    arScene.addEventListener('loaded', function () {
+    scene.addEventListener('loaded', function () {
         startBtn.disabled = false;
-        startBtn.classList.remove('loading');
         btnText.textContent = 'Iniciar Experiencia AR';
-        loadingStatus.textContent = 'Modelo listo. ¡Pulsa para empezar!';
-        loadingStatus.classList.add('ready');
+        status.textContent = 'Pulsa para empezar';
+        status.classList.add('ready');
     });
 
-    // Handle asset load errors
-    arScene.addEventListener('error', function () {
-        btnText.textContent = 'Error al cargar';
-        loadingStatus.textContent = 'No se pudo cargar el modelo. Comprueba assets/model.glb';
-        loadingStatus.classList.add('error');
-    });
-
-    // START AR
+    // iniciar AR
     startBtn.addEventListener('click', async function () {
-        if (arStarted) return;
-
+        if (started) return;
         landing.classList.add('hidden');
         arContainer.classList.remove('hidden');
-        arHint.classList.remove('hidden');
+        hint.classList.remove('hidden');
 
         try {
-            const mindARSystem = arScene.systems['mindar-image-system'];
-            if (mindARSystem) {
-                await mindARSystem.start();
-                arStarted = true;
+            await video.play();
+            video.muted = false;
+        } catch (e) {
+            console.warn('video play fallo:', e);
+        }
+
+        try {
+            var sys = scene.systems['mindar-image-system'];
+            if (sys) {
+                await sys.start();
+                started = true;
             } else {
-                arScene.addEventListener('renderstart', async function () {
-                    const sys = arScene.systems['mindar-image-system'];
-                    if (sys) {
-                        await sys.start();
-                        arStarted = true;
+                scene.addEventListener('renderstart', async function () {
+                    var s = scene.systems['mindar-image-system'];
+                    if (s) {
+                        await s.start();
+                        started = true;
                     }
                 }, { once: true });
             }
         } catch (e) {
-            console.error('Error starting AR:', e);
-            loadingStatus.textContent = 'Error al iniciar la cámara. ¿Permiso denegado?';
-            loadingStatus.classList.add('error');
+            console.error('error camara:', e);
             landing.classList.remove('hidden');
             arContainer.classList.add('hidden');
         }
     });
 
-    // STOP AR
+    // cerrar AR
     stopBtn.addEventListener('click', function () {
-        if (!arStarted) return;
-
-        const mindARSystem = arScene.systems['mindar-image-system'];
-        if (mindARSystem) {
-            mindARSystem.stop();
-        }
-        arStarted = false;
-
+        if (!started) return;
+        var sys = scene.systems['mindar-image-system'];
+        if (sys) sys.stop();
+        video.pause();
+        video.muted = true;
+        started = false;
         arContainer.classList.add('hidden');
         landing.classList.remove('hidden');
     });
 
-    // TARGET FOUND / LOST events
-    if (marker) {
-        marker.addEventListener('targetFound', function () {
-            arHint.classList.add('hidden');
-        });
+    // cuando detecta o pierde la imagen
+    marker.addEventListener('targetFound', function () {
+        hint.classList.add('hidden');
+        video.play();
+        video.muted = false;
+    });
 
-        marker.addEventListener('targetLost', function () {
-            arHint.classList.remove('hidden');
-        });
-    }
+    marker.addEventListener('targetLost', function () {
+        hint.classList.remove('hidden');
+        video.pause();
+        video.muted = true;
+    });
 });

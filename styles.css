@@ -15,7 +15,6 @@ body {
     position: relative;
 }
 
-/* Animated gradient background */
 body::before {
     content: '';
     position: fixed;
@@ -41,7 +40,6 @@ body::before {
     100% { transform: rotate(360deg); }
 }
 
-/* Floating particles */
 .particles {
     position: fixed;
     top: 0;
@@ -67,19 +65,14 @@ body::before {
         transform: translateY(100vh) scale(0);
         opacity: 0;
     }
-    10% {
-        opacity: 1;
-    }
-    90% {
-        opacity: 1;
-    }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
     100% {
         transform: translateY(-10vh) scale(1);
         opacity: 0;
     }
 }
 
-/* Title container */
 .title-container {
     position: relative;
     z-index: 2;
@@ -100,7 +93,6 @@ h1 {
     background-clip: text;
     animation: shiftGradient 6s ease-in-out infinite;
     filter: drop-shadow(0 0 30px rgba(167, 139, 250, 0.3));
-    position: relative;
     word-break: break-word;
     line-height: 1.2;
 }
@@ -110,7 +102,6 @@ h1 {
     50% { background-position: 100% 50%; }
 }
 
-/* Subtle glowing underline */
 .title-container::after {
     content: '';
     display: block;
@@ -127,7 +118,6 @@ h1 {
     50% { opacity: 1; transform: scaleX(1); }
 }
 
-/* Subtitle */
 .subtitle {
     margin-top: 1.2rem;
     font-size: clamp(0.75rem, 2.5vw, 1.2rem);
@@ -137,7 +127,6 @@ h1 {
     text-transform: uppercase;
 }
 
-/* ==================== LANDING ==================== */
 #landing {
     display: flex;
     align-items: center;
@@ -148,7 +137,7 @@ h1 {
     z-index: 1;
 }
 
-/* ==================== AR BUTTON ==================== */
+/* boton AR */
 .btn-ar {
     display: inline-flex;
     align-items: center;
@@ -168,7 +157,6 @@ h1 {
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
     box-shadow: 0 4px 25px rgba(139, 92, 246, 0.4);
-    position: relative;
     overflow: hidden;
 }
 
@@ -186,7 +174,6 @@ h1 {
     cursor: wait;
 }
 
-/* Spinner inside button */
 .btn-ar-spinner {
     display: inline-block;
     width: 18px;
@@ -205,25 +192,19 @@ h1 {
     to { transform: rotate(360deg); }
 }
 
-/* Loading status text */
 .loading-status {
     margin-top: 1rem;
     font-size: clamp(0.7rem, 2vw, 0.9rem);
     font-weight: 300;
     color: rgba(200, 210, 240, 0.5);
     letter-spacing: 0.05em;
-    transition: color 0.3s;
 }
 
 .loading-status.ready {
     color: rgba(110, 231, 183, 0.8);
 }
 
-.loading-status.error {
-    color: rgba(248, 113, 113, 0.8);
-}
-
-/* ==================== AR CONTAINER ==================== */
+/* contenedor AR */
 .ar-container {
     position: fixed;
     top: 0;
@@ -234,18 +215,16 @@ h1 {
     background: #000;
 }
 
-.ar-container.hidden,
 .hidden {
     display: none !important;
 }
 
-/* AR scene fullscreen */
 .ar-container a-scene {
     width: 100% !important;
     height: 100% !important;
 }
 
-/* ==================== AR OVERLAY ==================== */
+/* overlay cerrar */
 .ar-overlay {
     position: fixed;
     top: 0;
@@ -279,7 +258,7 @@ h1 {
     transform: scale(1.05);
 }
 
-/* ==================== AR HINT ==================== */
+/* hint abajo */
 .ar-hint {
     position: fixed;
     bottom: 2rem;
@@ -303,104 +282,43 @@ h1 {
     white-space: nowrap;
 }
 
-.ar-hint.hidden {
-    display: none !important;
-}
-
-/* ==================== RESPONSIVE ==================== */
-
-/* Tablets */
-@media screen and (max-width: 768px) {
+/* responsive */
+@media (max-width: 768px) {
     h1 {
         font-size: clamp(1.6rem, 7vw, 3.5rem);
         letter-spacing: 0.03em;
     }
-
-    .subtitle {
-        letter-spacing: 0.2em;
-    }
-
-    .title-container::after {
-        width: 70%;
-        height: 2px;
-    }
-
-    .btn-ar {
-        padding: 0.9rem 2rem;
-    }
+    .subtitle { letter-spacing: 0.2em; }
+    .title-container::after { width: 70%; height: 2px; }
+    .btn-ar { padding: 0.9rem 2rem; }
 }
 
-/* Phones */
-@media screen and (max-width: 480px) {
-    .title-container {
-        padding: 1rem;
-        width: 95%;
-    }
-
+@media (max-width: 480px) {
+    .title-container { padding: 1rem; width: 95%; }
     h1 {
         font-size: clamp(1.4rem, 9vw, 2.5rem);
         letter-spacing: 0.02em;
     }
-
     .subtitle {
         margin-top: 0.8rem;
         letter-spacing: 0.15em;
         font-size: clamp(0.65rem, 3vw, 0.95rem);
     }
-
-    .title-container::after {
-        width: 80%;
-        margin-top: 0.7rem;
-    }
-
-    .btn-ar {
-        padding: 0.8rem 1.8rem;
-        font-size: 0.85rem;
-    }
-
-    .ar-hint {
-        bottom: 1.5rem;
-        padding: 0.6rem 1.2rem;
-    }
+    .title-container::after { width: 80%; margin-top: 0.7rem; }
+    .btn-ar { padding: 0.8rem 1.8rem; font-size: 0.85rem; }
+    .ar-hint { bottom: 1.5rem; padding: 0.6rem 1.2rem; }
 }
 
-/* Very small screens */
-@media screen and (max-width: 320px) {
-    .title-container {
-        padding: 0.75rem;
-    }
-
-    h1 {
-        font-size: clamp(1.2rem, 10vw, 2rem);
-    }
-
-    .subtitle {
-        letter-spacing: 0.1em;
-        font-size: 0.65rem;
-    }
-
-    .btn-ar {
-        padding: 0.7rem 1.5rem;
-        font-size: 0.8rem;
-    }
+@media (max-width: 320px) {
+    .title-container { padding: 0.75rem; }
+    h1 { font-size: clamp(1.2rem, 10vw, 2rem); }
+    .subtitle { letter-spacing: 0.1em; font-size: 0.65rem; }
+    .btn-ar { padding: 0.7rem 1.5rem; font-size: 0.8rem; }
 }
 
-/* Landscape phones */
-@media screen and (max-height: 500px) and (orientation: landscape) {
-    h1 {
-        font-size: clamp(1.4rem, 6vh, 3rem);
-    }
-
-    .subtitle {
-        margin-top: 0.5rem;
-    }
-
-    .title-container::after {
-        margin-top: 0.5rem;
-    }
-
-    .btn-ar {
-        margin-top: 1rem;
-    }
+@media (max-height: 500px) and (orientation: landscape) {
+    h1 { font-size: clamp(1.4rem, 6vh, 3rem); }
+    .subtitle { margin-top: 0.5rem; }
+    .title-container::after { margin-top: 0.5rem; }
+    .btn-ar { margin-top: 1rem; }
 }
-
