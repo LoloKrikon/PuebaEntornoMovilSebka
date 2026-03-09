@@ -1,7 +1,3 @@
-## Herramientas Utilizadas
-- **A-Frame (v1.5.0):** Para renderizar la escena en 3D y colocar el vídeo en un plano.
-- **MindAR (v1.1.5):** Motor de seguimiento de imágenes para activar la cámara del dispositivo y detectar cuándo aparece la imagen `Enara.png`.
-- **aframe-chromakey-material:** Plugin necesario para hacer transparente el fondo verde (`0.1 0.9 0.2`) del vídeo.
 
 
 ## Modificaciones y Mejoras Realizadas
