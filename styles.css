@@ -5,320 +5,85 @@
 }
 
 body {
+    font-family: Arial, sans-serif;
+    background: #1a1a2e;
+    color: white;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Outfit', sans-serif;
-    background: #0a0a1a;
-    overflow: hidden;
-    position: relative;
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-        from 0deg at 50% 50%,
-        #0a0a1a 0deg,
-        #1a0a3a 60deg,
-        #0a1a3a 120deg,
-        #0a0a1a 180deg,
-        #2a0a2a 240deg,
-        #0a2a3a 300deg,
-        #0a0a1a 360deg
-    );
-    animation: rotateGradient 20s linear infinite;
-    z-index: 0;
-}
-
-@keyframes rotateGradient {
-    100% { transform: rotate(360deg); }
-}
-
-.particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-}
-
-.particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: rgba(120, 180, 255, 0.6);
-    border-radius: 50%;
-    animation: float linear infinite;
-    box-shadow: 0 0 8px rgba(120, 180, 255, 0.4);
-}
-
-@keyframes float {
-    0% {
-        transform: translateY(100vh) scale(0);
-        opacity: 0;
-    }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% {
-        transform: translateY(-10vh) scale(1);
-        opacity: 0;
-    }
-}
-
-.title-container {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    padding: 1.5rem;
-    width: 90%;
-    max-width: 900px;
-}
-
-h1 {
-    font-size: clamp(1.8rem, 8vw, 6rem);
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    color: transparent;
-    background: linear-gradient(135deg, #6ee7f7, #a78bfa, #f472b6, #6ee7f7);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    animation: shiftGradient 6s ease-in-out infinite;
-    filter: drop-shadow(0 0 30px rgba(167, 139, 250, 0.3));
-    word-break: break-word;
-    line-height: 1.2;
-}
-
-@keyframes shiftGradient {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-.title-container::after {
-    content: '';
-    display: block;
-    margin: 1rem auto 0;
-    width: 60%;
-    height: 3px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, transparent, #a78bfa, #6ee7f7, #a78bfa, transparent);
-    animation: pulseGlow 3s ease-in-out infinite;
-}
-
-@keyframes pulseGlow {
-    0%, 100% { opacity: 0.5; transform: scaleX(0.8); }
-    50% { opacity: 1; transform: scaleX(1); }
-}
-
-.subtitle {
-    margin-top: 1.2rem;
-    font-size: clamp(0.75rem, 2.5vw, 1.2rem);
-    font-weight: 300;
-    color: rgba(200, 210, 240, 0.6);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
 }
 
 #landing {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
     min-height: 100vh;
-    position: relative;
-    z-index: 1;
+    text-align: center;
+    padding: 20px;
 }
 
-/* boton AR */
-.btn-ar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-top: 2rem;
-    padding: 1rem 2.5rem;
-    font-family: 'Outfit', sans-serif;
-    font-size: clamp(0.9rem, 2.5vw, 1.15rem);
-    font-weight: 600;
-    color: #fff;
-    background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
-    background-size: 200% 200%;
-    animation: shiftGradient 4s ease-in-out infinite;
+#landing h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+#landing p {
+    color: #aaa;
+    margin-bottom: 30px;
+}
+
+#start-btn {
+    padding: 15px 40px;
+    font-size: 1rem;
+    background: #6c5ce7;
+    color: white;
     border: none;
-    border-radius: 50px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    box-shadow: 0 4px 25px rgba(139, 92, 246, 0.4);
-    overflow: hidden;
 }
 
-.btn-ar:hover:not(:disabled) {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 6px 35px rgba(139, 92, 246, 0.6);
+#start-btn:hover {
+    background: #5a4bd1;
 }
 
-.btn-ar:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
-}
-
-.btn-ar:disabled {
-    opacity: 0.7;
-    cursor: wait;
-}
-
-.btn-ar-spinner {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-.btn-ar:not(:disabled) .btn-ar-spinner {
-    display: none;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loading-status {
-    margin-top: 1rem;
-    font-size: clamp(0.7rem, 2vw, 0.9rem);
-    font-weight: 300;
-    color: rgba(200, 210, 240, 0.5);
-    letter-spacing: 0.05em;
-}
-
-.loading-status.ready {
-    color: rgba(110, 231, 183, 0.8);
-}
-
-/* contenedor AR */
-.ar-container {
+/* ar */
+#ar-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: 100;
-    background: #000;
+    background: black;
 }
 
 .hidden {
     display: none !important;
 }
 
-.ar-container a-scene {
+#ar-container a-scene {
     width: 100% !important;
     height: 100% !important;
 }
 
-/* overlay cerrar */
-.ar-overlay {
+#close-btn {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 1rem;
-    display: flex;
-    justify-content: flex-end;
+    top: 15px;
+    right: 15px;
     z-index: 110;
-    pointer-events: none;
-}
-
-.btn-close-ar {
-    pointer-events: all;
-    font-family: 'Outfit', sans-serif;
+    padding: 8px 16px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
     font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.6rem 1.2rem;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 30px;
     cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
 }
 
-.btn-close-ar:hover {
-    background: rgba(239, 68, 68, 0.7);
-    transform: scale(1.05);
+#close-btn:hover {
+    background: rgba(200,0,0,0.5);
 }
 
-/* hint abajo */
-.ar-hint {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 110;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 0.8rem 1.5rem;
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    pointer-events: none;
-}
-
-.ar-hint p {
-    font-family: 'Outfit', sans-serif;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: clamp(0.75rem, 2vw, 0.95rem);
-    font-weight: 300;
-    white-space: nowrap;
-}
-
-/* responsive */
-@media (max-width: 768px) {
-    h1 {
-        font-size: clamp(1.6rem, 7vw, 3.5rem);
-        letter-spacing: 0.03em;
-    }
-    .subtitle { letter-spacing: 0.2em; }
-    .title-container::after { width: 70%; height: 2px; }
-    .btn-ar { padding: 0.9rem 2rem; }
-}
-
-@media (max-width: 480px) {
-    .title-container { padding: 1rem; width: 95%; }
-    h1 {
-        font-size: clamp(1.4rem, 9vw, 2.5rem);
-        letter-spacing: 0.02em;
-    }
-    .subtitle {
-        margin-top: 0.8rem;
-        letter-spacing: 0.15em;
-        font-size: clamp(0.65rem, 3vw, 0.95rem);
-    }
-    .title-container::after { width: 80%; margin-top: 0.7rem; }
-    .btn-ar { padding: 0.8rem 1.8rem; font-size: 0.85rem; }
-    .ar-hint { bottom: 1.5rem; padding: 0.6rem 1.2rem; }
-}
-
-@media (max-width: 320px) {
-    .title-container { padding: 0.75rem; }
-    h1 { font-size: clamp(1.2rem, 10vw, 2rem); }
-    .subtitle { letter-spacing: 0.1em; font-size: 0.65rem; }
-    .btn-ar { padding: 0.7rem 1.5rem; font-size: 0.8rem; }
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-    h1 { font-size: clamp(1.4rem, 6vh, 3rem); }
-    .subtitle { margin-top: 0.5rem; }
-    .title-container::after { margin-top: 0.5rem; }
-    .btn-ar { margin-top: 1rem; }
+.a-enter-vr-button,
+.a-enter-ar-button {
+    display: none !important;
 }

@@ -4,39 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prueba 3D Sebka</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.5/dist/mindar-image.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://unpkg.com/aframe-chromakey-material/dist/aframe-chromakey-material.min.js"></script>
 </head>
 <body>
 
     <div id="landing">
-        <div class="particles" id="particles"></div>
-        <div class="title-container">
-            <h1>Prueba 3D Sebka</h1>
-            <p class="subtitle">Sebka Technology</p>
-            <button id="start-ar-btn" class="btn-ar" disabled>
-                <span class="btn-ar-spinner"></span>
-                <span class="btn-ar-text">Cargando...</span>
-            </button>
-            <p id="loading-status" class="loading-status">Preparando experiencia AR...</p>
-        </div>
+        <h1>Prueba 3D Sebka</h1>
+        <p>Sebka Technology</p>
+        <button id="start-btn">Iniciar Experiencia AR</button>
     </div>
 
-    <div id="ar-container" class="ar-container hidden">
-        <div class="ar-overlay">
-            <button id="stop-ar-btn" class="btn-close-ar">✕ Cerrar AR</button>
-        </div>
-        <div id="ar-hint" class="ar-hint">
-            <p>📷 Apunta la cámara a la imagen target</p>
-        </div>
+    <div id="ar-container" class="hidden">
+        <button id="close-btn">✕ Cerrar</button>
 
         <a-scene id="ar-scene"
-            mindar-image="imageTargetSrc: assets/targets.mind; autoStart: false; filterMinCF: 0.0001; filterBeta: 1000;"
-            color-space="sRGB" renderer="colorManagement: true; physicallyCorrectLights: true; logarithmicDepthBuffer: true;"
-            vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false" embedded>
+            mindar-image="imageTargetSrc: assets/targets.mind; filterMinCF: 0.0001;"
+            embedded vr-mode-ui="enabled: false"
+            device-orientation-permission-ui="enabled: false"
+            color-space="sRGB"
+            renderer="colorManagement: true; physicallyCorrectLights; logarithmicDepthBuffer: true;">
             <a-assets>
                 <video id="ar-video" src="assets/asset.mp4" playsinline crossorigin loop></video>
             </a-assets>
@@ -48,18 +38,6 @@
         </a-scene>
     </div>
 
-    <script>
-        var container = document.getElementById('particles');
-        for (var i = 0; i < 40; i++) {
-            var p = document.createElement('div');
-            p.classList.add('particle');
-            p.style.left = Math.random() * 100 + '%';
-            p.style.animationDuration = (6 + Math.random() * 10) + 's';
-            p.style.animationDelay = (Math.random() * 10) + 's';
-            p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
-            container.appendChild(p);
-        }
-    </script>
     <script src="ar.js"></script>
 </body>
 </html>
