@@ -5,12 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const video = document.getElementById('alpha');
   const sceneEl = document.querySelector('a-scene');
 
-  // Esto espera a que el archivo de video (que pesa mucho) se descargue lo suficiente
-  // para que no haya tirones. Cuando está listo, activa el botón principal.
-  video.addEventListener('canplaythrough', () => {
-    playButton.disabled = false;
-    playButton.textContent = 'Iniciar';
-  });
+  // Hemos quitado la limitación de esperar a que el vídeo pregargue,
+  // porque en iPhone a veces no avisa de que el vídeo está listo hasta que no le das al Play.
 
   // Evento principal: Que pasa cuando pulsamos el boton de Iniciar
   playButton.addEventListener('click', async () => {
