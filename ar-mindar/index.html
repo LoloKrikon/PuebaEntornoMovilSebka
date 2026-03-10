@@ -4,8 +4,9 @@
 <head>
     <meta charset="utf-8">
     <title>AR Sin Marcador</title>
-    <!-- Configuración del viewport para dispositivos móviles -->
+    <!-- para moviles -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- importamos aframe -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
     <style>
@@ -16,11 +17,11 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #222;
         }
 
-        /* Capa superpuesta de la interfaz (WebAR overlay) */
+        /* overlay para poner el boton por encima de la camara */
         #ui-container {
             position: absolute;
             top: 0;
@@ -38,7 +39,6 @@
 
         #ar-button {
             pointer-events: auto;
-            /* Habilitar interacción para el botón */
             background: #007AFF;
             color: white;
             border: none;
@@ -64,7 +64,7 @@
             display: none;
         }
 
-        /* Ocultar el botón VR predeterminado de A-Frame */
+        /* escondemos el boton de VR normal de aframe */
         .a-enter-vr {
             display: none !important;
         }
@@ -73,21 +73,22 @@
 
 <body>
     <div id="ui-container">
-        <div id="instruction">Mueva el dispositivo para detectar el plano</div>
+        <!-- texto que va cambiando -->
+        <div id="instruction">Mueve el móvil despacio para encontrar el suelo</div>
         <button id="ar-button">Ver en AR</button>
     </div>
 
-    <!-- Enlace para dispositivos iOS (QuickLook) -->
+    <!-- enlace invisible para iphone (usdz) -->
     <a id="enlace-ios" rel="ar" href="./assets/tu-modelo.usdz" style="display: none;">
         <img src="" alt="AR">
     </a>
 
-    <!-- Lógica de la aplicación AR -->
     <script>
-        const archivoGLB = "./assets/tu-modelo.glb";
+        // ruta del modelo (android)
+        const archivoGltf = "./assets/tu-modelo.glb";
 
-        // Función para detectar dispositivos iOS y habilitar QuickLook
-        function esiOS() {
+        // comprobar si el sistema es iOS
+        function checkIOS() {
             return [
                 'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'
             ].includes(navigator.platform)
@@ -95,125 +96,133 @@
                 || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
         }
 
-        // Componente personalizado para gestionar el WebXR Hit Test en Android
+        // componente hecho a mano para colocar el objeto donde toca la persona (hit test)
         AFRAME.registerComponent('hit-test-handler', {
             init: function () {
-                let self = this;
+                let ctx = this;
                 this.hitSource = null;
                 this.localSpace = null;
-                this.esModeloColocado = false;
+                this.modeloPuesto = false;
 
-                let elementoInstruccion = document.getElementById('instruction');
+                let txtInfo = document.getElementById('instruction');
 
                 this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
-                    let session = this.el.sceneEl.renderer.xr.getSession();
+                    let sess = this.el.sceneEl.renderer.xr.getSession();
 
-                    session.requestReferenceSpace('viewer').then((space) => {
-                        session.requestHitTestSource({ space: space }).then((source) => {
-                            self.hitSource = source;
+                    sess.requestReferenceSpace('viewer').then((space) => {
+                        sess.requestHitTestSource({ space: space }).then((source) => {
+                            ctx.hitSource = source;
                         });
                     });
 
-                    session.requestReferenceSpace('local').then((space) => {
-                        self.localSpace = space;
+                    sess.requestReferenceSpace('local').then((space) => {
+                        ctx.localSpace = space;
                     });
 
-                    session.addEventListener('select', () => {
-                        // Verificar si el retículo es visible y el modelo aún no se ha colocado
-                        if (self.el.getAttribute('visible') && !self.esModeloColocado) {
+                    sess.addEventListener('select', () => {
+                        // si el anillo se esta viendo y no hemos puesto aun el modelo 3d
+                        if (ctx.el.getAttribute('visible') && !ctx.modeloPuesto) {
 
-                            // Instanciar el modelo 3D
-                            let modelo = document.createElement('a-entity');
-                            modelo.setAttribute('gltf-model', archivoGLB);
-                            modelo.setAttribute('position', self.el.getAttribute('position'));
-                            modelo.setAttribute('scale', '1 1 1');
+                            // creamos la entidad 3d
+                            let modelObj = document.createElement('a-entity');
+                            modelObj.setAttribute('gltf-model', archivoGltf);
+                            modelObj.setAttribute('position', ctx.el.getAttribute('position'));
+                            modelObj.setAttribute('scale', '1 1 1');
 
-                            self.el.sceneEl.appendChild(modelo);
-                            self.esModeloColocado = true;
+                            // lo añadimos a la escena
+                            ctx.el.sceneEl.appendChild(modelObj);
+                            ctx.modeloPuesto = true;
 
-                            self.el.setAttribute('visible', 'false');
-                            elementoInstruccion.innerText = "¡Modelo posicionado con éxito!";
+                            ctx.el.setAttribute('visible', 'false');
+                            txtInfo.innerText = "¡Ya está!";
 
-                            setTimeout(() => { elementoInstruccion.style.display = 'none'; }, 2000);
+                            // quitar mensaje a los 2 segundos
+                            setTimeout(() => { txtInfo.style.display = 'none'; }, 2000);
                         }
                     });
                 });
 
                 this.el.sceneEl.renderer.xr.addEventListener('sessionend', () => {
-                    self.hitSource = null;
-                    elementoInstruccion.style.display = 'none';
+                    // cuando cerramos el ar reseteamos cosas
+                    ctx.hitSource = null;
+                    txtInfo.style.display = 'none';
                     document.getElementById('ar-button').style.display = 'block';
-                    self.esModeloColocado = false;
+                    ctx.modeloPuesto = false;
                 });
             },
 
             tick: function () {
-                if (this.esModeloColocado) return;
+                // si ya lo hemos puesto no hacemos nada mas
+                if (this.modeloPuesto) return;
 
-                let elementoInstruccion = document.getElementById('instruction');
+                let txtInfo = document.getElementById('instruction');
 
+                // si estamos dentro de ar buscando el hit
                 if (this.el.sceneEl.is('ar-mode')) {
                     if (!this.hitSource || !this.localSpace) return;
 
-                    let frame = this.el.sceneEl.frame;
-                    if (!frame) return;
+                    let currentFrame = this.el.sceneEl.frame;
+                    if (!currentFrame) return;
 
-                    let hits = frame.getHitTestResults(this.hitSource);
+                    let hits = currentFrame.getHitTestResults(this.hitSource);
 
                     if (hits.length > 0) {
-                        // Plano detectado exitosamente
+                        // pillamos la posicion en el plano
                         let pose = hits[0].getPose(this.localSpace);
 
+                        // enseñamos el anillo
                         this.el.setAttribute('visible', 'true');
                         this.el.setAttribute('position', pose.transform.position);
 
-                        elementoInstruccion.innerText = "Toque la pantalla para posicionar el modelo";
+                        txtInfo.innerText = "Toca para poner el modelo";
                     } else {
-                        // Plano no detectado
+                        // si no hay plano ocultamos el anillo
                         this.el.setAttribute('visible', 'false');
-                        elementoInstruccion.innerText = "Buscando superficie plana...";
+                        txtInfo.innerText = "Buscando el suelo...";
                     }
                 }
             }
         });
 
+        // al cargar la pagina preparamos botones
         window.onload = () => {
-            let botonAr = document.getElementById('ar-button');
-            let enlaceIos = document.getElementById('enlace-ios');
-            let elementoInstruccion = document.getElementById('instruction');
-            let escena = document.querySelector('a-scene');
+            let btnMain = document.getElementById('ar-button');
+            let linkIos = document.getElementById('enlace-ios');
+            let txtInfo = document.getElementById('instruction');
+            let mainScene = document.querySelector('a-scene');
 
-            botonAr.addEventListener('click', () => {
-                if (esiOS()) {
-                    // Acción para dispositivos iOS: Abrir enlace USDZ
-                    enlaceIos.click();
+            btnMain.addEventListener('click', () => {
+                if (checkIOS()) {
+                    // en apple forzamos click al enlace usdz
+                    linkIos.click();
                 } else {
-                    // Acción para navegadores compatibles (Chrome AR): Iniciar sesión WebXR
-                    if (escena.hasLoaded) {
-                        escena.enterVR(true);
-                        botonAr.style.display = 'none';
-                        elementoInstruccion.style.display = 'block';
+                    // en android le decimos a aframe que abra el webxr
+                    if (mainScene.hasLoaded) {
+                        mainScene.enterVR(true);
+                        btnMain.style.display = 'none';
+                        txtInfo.style.display = 'block';
                     }
                 }
             });
 
-            escena.addEventListener('exit-vr', function () {
-                elementoInstruccion.style.display = 'none';
-                botonAr.style.display = 'block';
+            mainScene.addEventListener('exit-vr', function () {
+                txtInfo.style.display = 'none';
+                btnMain.style.display = 'block';
             });
         };
     </script>
 
-    <!-- Definición de la escena A-Frame -->
+    <!-- configuramos webxr para q pida el hit-test y superponga el div de los botones -->
     <a-scene webxr="requiredFeatures: hit-test, local; optionalFeatures: dom-overlay; overlayElement: #ui-container"
         xr-mode-ui="enabled: false">
 
         <a-camera position="0 1.6 0"></a-camera>
 
+        <!-- un poco de luz simple -->
         <a-light type="ambient" intensity="0.6"></a-light>
         <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
 
-        <!-- Retículo para indicar la posición del modelo -->
+        <!-- el circulito / diana donde se va a colocar el modelo -->
         <a-entity hit-test-handler visible="false">
             <a-ring color="#00ffff" radius-inner="0.1" radius-outer="0.15" rotation="-90 0 0" opacity="0.8"></a-ring>
         </a-entity>
