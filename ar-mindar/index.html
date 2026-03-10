@@ -30,8 +30,8 @@
     renderer="colorManagement: true, physicallyCorrectLights, logarithmicDepthBuffer: true;" vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false" color-space="sRGB">
     <a-assets>
-      <video src="asset.mp4" id="alpha" response-type="arraybuffer" crossorigin renderer="logarithmicDepthBuffer: true;"
-        playsinline></video>
+      <!-- limpio atributos raros que daban el fallo de capa negra en el movil -->
+      <video src="asset.mp4" id="alpha" crossorigin="anonymous" playsinline autoplay muted loop></video>
     </a-assets>
     <a-entity>
       <a-camera position="0 0 0" scale="0.20 0.20 0.20" look-controls="enabled: false"></a-camera>
