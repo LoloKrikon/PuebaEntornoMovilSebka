@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
     arHint.style.display = 'block';
 
     try {
-      await video.play(); // Le damos al play silencioso al video antes de abrir camara
-      video.muted = false;
+      await video.play(); // Le damos al play al video para que el navegador nos dé permiso
+      video.pause(); // Lo pausamos inmediatamente para esperar a que detecte la foto
     } catch (e) {
       console.warn('Video play failed:', e);
     }
