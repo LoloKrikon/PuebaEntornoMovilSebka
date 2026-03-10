@@ -1,67 +1,21 @@
 <!DOCTYPE html>
-<html lang="es">
+  <html lang="en">
+    
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, user-scalable=no, viewport-fit=cover">
+    <title>Made with Needle</title>
+    <meta name="robots" content="index,follow">
+    <link rel="stylesheet" href="./src/styles/style.css">
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <title>AR con Needle Engine</title>
-    <!-- para moviles -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-    <!-- importmap para que needle encuentre threejs -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
-                "three/": "https://cdn.jsdelivr.net/npm/three/"
-            }
-        }
-    </script>
-
-    <!-- importamos needle engine desde cdn -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@needle-tools/engine/dist/needle-engine.min.js"></script>
-
-    <style>
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #111;
-        }
-
-        /* needle engine ocupa toda la pantalla */
-        needle-engine {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- motor needle con el modelo y controles de camara -->
-    <!-- el boton de AR lo pone needle automaticamente -->
-    <needle-engine src="./assets/tu-modelo.glb" camera-controls autoplay environment-image="studio"
-        background-color="transparent">
-    </needle-engine>
-
-    <script type="module">
-        import { onStart, WebXR, GameObject, Vector3 } from "https://cdn.jsdelivr.net/npm/@needle-tools/engine/dist/needle-engine.min.js";
-
-        // cuando needle termina de cargar la escena
-        onStart((ctx) => {
-            // añadimos el componente WebXR de needle
-            // esto activa el boton de AR con hit-test y deteccion de suelo incluidos
-            const xrComp = GameObject.addComponent(ctx.scene, WebXR);
-
-            // activamos la opcion de ios (quicklook con usdz)
-            xrComp.usdzSrc = "./assets/tu-modelo.usdz";
-        });
-    </script>
-
-</body>
+  <body>
+    <script type="module" src="./src/main.ts"></script>
+    <!-- https://engine.needle.tools/docs/reference/needle-engine-attributes -->
+    <needle-engine environment-image="https://cdn.needle.tools/static/hdris/photo_studio_01_4k.pmrem.ktx2" 
+    background-image="https://cdn.needle.tools/static/hdris/photo_studio_01_4k.pmrem.ktx2"
+    background-blurriness=".2"></needle-engine>
+  </body>
 
 </html>
