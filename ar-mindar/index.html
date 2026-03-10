@@ -2,49 +2,223 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Experiencia AR Sebka</title>
-  <meta name="viewport" content="width=device-width,user-scalable=no, initial-scale=0.4,maximum-scale=1" />
+    <meta charset="utf-8">
+    <title>AR Sin Marcador</title>
+    <!-- Configuración del viewport para dispositivos móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.5/dist/mindar-image.prod.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.5/dist/mindar-image-aframe.prod.js"></script>
-  <script src="https://unpkg.com/aframe-chromakey-material/dist/aframe-chromakey-material.min.js"></script>
-  <link rel="stylesheet" href="styles.css">
-  <script src="ar.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: sans-serif;
+            background-color: #222;
+        }
 
+        /* Capa superpuesta de la interfaz (WebAR overlay) */
+        #ui-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        #ar-button {
+            pointer-events: auto;
+            /* Habilitar interacción para el botón */
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+
+        #ar-button:active {
+            transform: scale(0.95);
+        }
+
+        #instruction {
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        /* Ocultar el botón VR predeterminado de A-Frame */
+        .a-enter-vr {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="ui-container">
+        <div id="instruction">Mueva el dispositivo para detectar el plano</div>
+        <button id="ar-button">Ver en AR</button>
+    </div>
 
-  <!-- Botón principal. Ya no está bloqueado esperando al cargador. -->
-  <button id="playButton">Iniciar</button>
+    <!-- Enlace para dispositivos iOS (QuickLook) -->
+    <a id="enlace-ios" rel="ar" href="./assets/tu-modelo.usdz" style="display: none;">
+        <img src="" alt="AR">
+    </a>
 
-  <!-- Botón para cerrar la cámara sin tener que recargar la página -->
-  <button id="closeButton" style="display: none;">Cerrar AR</button>
+    <!-- Lógica de la aplicación AR -->
+    <script>
+        const archivoGLB = "./assets/tu-modelo.glb";
 
-  <!-- Mensaje de ayuda para el usuario -->
-  <div id="ar-hint" style="display: none;">Apunta la cámara a la imagen</div>
+        // Función para detectar dispositivos iOS y habilitar QuickLook
+        function esiOS() {
+            return [
+                'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'
+            ].includes(navigator.platform)
+                || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+                || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
+        }
 
-  <a-scene id="target" mindar-image="imageTargetSrc:Mark/targets.mind;filterMinCF: 0.0001;" embedded
-    renderer="colorManagement: true, physicallyCorrectLights, logarithmicDepthBuffer: true;" vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false" color-space="sRGB">
-    <a-assets>
-      <!-- limpio atributos raros que daban el fallo de capa negra en el movil -->
-      <video src="asset.mp4" id="alpha" crossorigin="anonymous" playsinline muted loop></video>
-    </a-assets>
-    <a-entity>
-      <a-camera position="0 0 0" scale="0.20 0.20 0.20" look-controls="enabled: false"></a-camera>
-      <a-entity id="marker" mindar-image-target="targetIndex: 0">
+        // Componente personalizado para gestionar el WebXR Hit Test en Android
+        AFRAME.registerComponent('hit-test-handler', {
+            init: function () {
+                let self = this;
+                this.hitSource = null;
+                this.localSpace = null;
+                this.esModeloColocado = false;
 
-        <!-- Error video en negro solucionado: Se añade transparent: true al material -->
-        <a-plane material="shader: chromakey; src: #alpha; color: 0.1 0.9 0.2; transparent: true" position="0 0 0"
-          scale="2 4 2"></a-plane>
+                let elementoInstruccion = document.getElementById('instruction');
 
-      </a-entity>
-    </a-entity>
-  </a-scene>
+                this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
+                    let session = this.el.sceneEl.renderer.xr.getSession();
 
+                    session.requestReferenceSpace('viewer').then((space) => {
+                        session.requestHitTestSource({ space: space }).then((source) => {
+                            self.hitSource = source;
+                        });
+                    });
+
+                    session.requestReferenceSpace('local').then((space) => {
+                        self.localSpace = space;
+                    });
+
+                    session.addEventListener('select', () => {
+                        // Verificar si el retículo es visible y el modelo aún no se ha colocado
+                        if (self.el.getAttribute('visible') && !self.esModeloColocado) {
+
+                            // Instanciar el modelo 3D
+                            let modelo = document.createElement('a-entity');
+                            modelo.setAttribute('gltf-model', archivoGLB);
+                            modelo.setAttribute('position', self.el.getAttribute('position'));
+                            modelo.setAttribute('scale', '1 1 1');
+
+                            self.el.sceneEl.appendChild(modelo);
+                            self.esModeloColocado = true;
+
+                            self.el.setAttribute('visible', 'false');
+                            elementoInstruccion.innerText = "¡Modelo posicionado con éxito!";
+
+                            setTimeout(() => { elementoInstruccion.style.display = 'none'; }, 2000);
+                        }
+                    });
+                });
+
+                this.el.sceneEl.renderer.xr.addEventListener('sessionend', () => {
+                    self.hitSource = null;
+                    elementoInstruccion.style.display = 'none';
+                    document.getElementById('ar-button').style.display = 'block';
+                    self.esModeloColocado = false;
+                });
+            },
+
+            tick: function () {
+                if (this.esModeloColocado) return;
+
+                let elementoInstruccion = document.getElementById('instruction');
+
+                if (this.el.sceneEl.is('ar-mode')) {
+                    if (!this.hitSource || !this.localSpace) return;
+
+                    let frame = this.el.sceneEl.frame;
+                    if (!frame) return;
+
+                    let hits = frame.getHitTestResults(this.hitSource);
+
+                    if (hits.length > 0) {
+                        // Plano detectado exitosamente
+                        let pose = hits[0].getPose(this.localSpace);
+
+                        this.el.setAttribute('visible', 'true');
+                        this.el.setAttribute('position', pose.transform.position);
+
+                        elementoInstruccion.innerText = "Toque la pantalla para posicionar el modelo";
+                    } else {
+                        // Plano no detectado
+                        this.el.setAttribute('visible', 'false');
+                        elementoInstruccion.innerText = "Buscando superficie plana...";
+                    }
+                }
+            }
+        });
+
+        window.onload = () => {
+            let botonAr = document.getElementById('ar-button');
+            let enlaceIos = document.getElementById('enlace-ios');
+            let elementoInstruccion = document.getElementById('instruction');
+            let escena = document.querySelector('a-scene');
+
+            botonAr.addEventListener('click', () => {
+                if (esiOS()) {
+                    // Acción para dispositivos iOS: Abrir enlace USDZ
+                    enlaceIos.click();
+                } else {
+                    // Acción para navegadores compatibles (Chrome AR): Iniciar sesión WebXR
+                    if (escena.hasLoaded) {
+                        escena.enterVR(true);
+                        botonAr.style.display = 'none';
+                        elementoInstruccion.style.display = 'block';
+                    }
+                }
+            });
+
+            escena.addEventListener('exit-vr', function () {
+                elementoInstruccion.style.display = 'none';
+                botonAr.style.display = 'block';
+            });
+        };
+    </script>
+
+    <!-- Definición de la escena A-Frame -->
+    <a-scene webxr="requiredFeatures: hit-test, local; optionalFeatures: dom-overlay; overlayElement: #ui-container"
+        xr-mode-ui="enabled: false">
+
+        <a-camera position="0 1.6 0"></a-camera>
+
+        <a-light type="ambient" intensity="0.6"></a-light>
+        <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
+
+        <!-- Retículo para indicar la posición del modelo -->
+        <a-entity hit-test-handler visible="false">
+            <a-ring color="#00ffff" radius-inner="0.1" radius-outer="0.15" rotation="-90 0 0" opacity="0.8"></a-ring>
+        </a-entity>
+
+    </a-scene>
 </body>
 
 </html>
