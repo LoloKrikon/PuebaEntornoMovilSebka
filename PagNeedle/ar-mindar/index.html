@@ -1,21 +1,73 @@
 <!DOCTYPE html>
-  <html lang="en">
-    
-  <head>
+<html lang="es">
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" href="favicon.ico">
     <meta name="viewport" content="width=device-width, user-scalable=no, viewport-fit=cover">
-    <title>Made with Needle</title>
-    <meta name="robots" content="index,follow">
+    <title>AR con Needle Engine</title>
     <link rel="stylesheet" href="./src/styles/style.css">
-  </head>
+    <style>
+        /* botón de AR propio por encima del visor */
+        #boton-ar {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
 
-  <body>
+        #boton-ar:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+    </style>
+</head>
+
+<body>
     <script type="module" src="./src/main.ts"></script>
-    <!-- https://engine.needle.tools/docs/reference/needle-engine-attributes -->
-    <needle-engine environment-image="https://cdn.needle.tools/static/hdris/photo_studio_01_4k.pmrem.ktx2" 
-    background-image="https://cdn.needle.tools/static/hdris/photo_studio_01_4k.pmrem.ktx2"
-    background-blurriness=".2"></needle-engine>
-  </body>
+
+    <!-- el visor 3d de needle -->
+    <needle-engine src="./assets/tu-modelo.glb" camera-controls autoplay environment-image="studio"
+        background-color="transparent">
+    </needle-engine>
+
+    <!-- enlace invisible para iphone (quicklook de apple) -->
+    <a id="enlace-ios" rel="ar" href="./assets/tu-modelo.usdz" style="display:none">
+        <img src="" alt="AR">
+    </a>
+
+    <!-- botón de AR visible para el usuario -->
+    <button id="boton-ar">Ver en AR</button>
+
+    <script>
+        // detectar si es iphone/ipad
+        function esIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        document.getElementById('boton-ar').addEventListener('click', () => {
+            if (esIOS()) {
+                // en iphone abrimos quicklook con el usdz (deteccion de suelo nativa de apple)
+                document.getElementById('enlace-ios').click();
+            } else {
+                // en android usamos el boton de AR de needle engine (webxr)
+                const needle = document.querySelector('needle-engine');
+                if (needle && needle.context) {
+                    needle.context.xr?.enterAR?.();
+                }
+            }
+        });
+    </script>
+</body>
 
 </html>
