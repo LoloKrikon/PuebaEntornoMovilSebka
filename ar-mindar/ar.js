@@ -78,13 +78,13 @@ document.addEventListener("DOMContentLoaded", function () {
   if (marker) {
     marker.addEventListener('targetFound', () => {
       console.log('target found');
-      arHint.style.display = 'none'; // Cuando encuentra la foto, borramos el mensaje de ayuda
+      arHint.style.display = 'none'; // Cuando encuentra la foto borramos el mensaje de ayuda
       video.play();
       video.muted = false;
     });
     marker.addEventListener('targetLost', () => {
       console.log('target lost');
-      arHint.style.display = 'block'; // Si apartas la cara de la foto, vuelve a salir el mensaje
+      arHint.style.display = 'block'; // Si apartas la cara de la foto vuelve a salir el mensaje
       video.pause();
       video.muted = true;
     });

@@ -31,3 +31,7 @@ Se añadió un globo de texto ("📷 Apunta la cámara a la imagen") que solo ap
 ### 3. Manejo de Errores y Experiencia
 - **Detección de Permisos de Cámara:** 
 Si el usuario pulsa "Bloquear" cuando su navegador le pide permisos de cámara, o si el navegador tiene el acceso capado por privacidad, la librería se quedaba pillada en la pantalla de carga infinita. Ahora se usa un bloque `try/catch` que detecta el fallo, lanza un `alert` nativo avisando del problema de privacidad, y esconde los mensajes de error visuales de la librería para devolverte al botón de inicio.
+
+- **Solución al Error del Vídeo en Negro:** 
+En el código original, el material del vídeo no indicaba que podía procesar transparencias. 
+Por culpa de esto, cuando el filtro Chromakey borraba el color verde, A-Frame rellenaba el espacio vacío dibujando un gran recuadro negro encima de la cámara. Se ha solucionado añadiendo la propiedad `transparent: true` al elemento `<a-plane>` en `index.html`.
