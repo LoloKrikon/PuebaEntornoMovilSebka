@@ -14,3 +14,11 @@ needle-engine {
     width: 100%;
     height: 100%;
 }
+
+/* quitar el enlace de needle.tools que aparece en la esquina */
+a[href*="needle.tools"],
+.needle-branding,
+#needle-branding,
+[class*="branding"] {
+    display: none !important;
+}
