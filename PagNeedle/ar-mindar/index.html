@@ -8,13 +8,12 @@
     <title>AR con Needle Engine</title>
     <link rel="stylesheet" href="./src/styles/style.css">
     <style>
-        /* botón de AR propio por encima del visor */
+        /* botón de AR movido a la izquierda para no taparse con el original */
         #boton-ar {
             position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999;
+            bottom: 30px;
+            left: 20px; /* Anclado a la izquierda */
+            z-index: 999999;
             background: #007AFF;
             color: white;
             border: none;
