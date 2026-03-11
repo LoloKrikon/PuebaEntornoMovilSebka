@@ -64,9 +64,59 @@
             display: none;
         }
 
-        /* escondemos el boton de VR normal de aframe */
         .a-enter-vr {
             display: none !important;
+        }
+
+        /* --- Personalización de la ventana de permisos de A-Frame --- */
+        .a-dialog {
+            background: #ffffff !important;
+            border-radius: 25px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+            border: none !important;
+            padding: 30px !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            max-width: 320px !important;
+        }
+
+        .a-dialog-text {
+            color: #333333 !important;
+            font-size: 17px !important;
+            line-height: 1.4 !important;
+            margin-bottom: 25px !important;
+            text-align: center !important;
+            display: block !important;
+        }
+
+        .a-dialog-buttons {
+            display: flex !important;
+            justify-content: center !important;
+            gap: 15px !important;
+        }
+
+        .a-dialog-allow-button,
+        .a-dialog-deny-button {
+            border-radius: 30px !important;
+            padding: 12px 25px !important;
+            font-weight: bold !important;
+            font-size: 15px !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: background 0.2s, transform 0.1s !important;
+        }
+
+        .a-dialog-allow-button {
+            background: #007AFF !important;
+            color: #ffffff !important;
+        }
+
+        .a-dialog-deny-button {
+            background: #f2f2f7 !important;
+            color: #8e8e93 !important;
+        }
+
+        .a-dialog-allow-button:active {
+            transform: scale(0.95) !important;
         }
     </style>
 </head>
