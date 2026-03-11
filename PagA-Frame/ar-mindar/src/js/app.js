@@ -110,26 +110,23 @@ window.onload = () => {
     let txtInfo = document.getElementById('instruction');
     let mainScene = document.querySelector('a-scene');
     
-    let btnOp1 = document.getElementById('btn-opcion1');
-    let btnOp2 = document.getElementById('btn-opcion2');
     let selectionMenu = document.getElementById('selection-menu');
+    let optionButtons = document.querySelectorAll('.option-button');
 
-    // Lógica selección Opción 1
-    btnOp1.addEventListener('click', () => {
-        archivoGltf = "./assets/Robot_Happy.glb";
-        linkIos.href = "./assets/Robot_Happy.usdz";
-        btnOp1.classList.add('active');
-        btnOp2.classList.remove('active');
-        btnMain.style.display = 'block'; // Mostrar el botón Ver en AR
-    });
-
-    // Lógica selección Opción 2
-    btnOp2.addEventListener('click', () => {
-        archivoGltf = "./assets/Robot_Headplay.glb";
-        linkIos.href = "./assets/Robot_Headplay.usdz";
-        btnOp2.classList.add('active');
-        btnOp1.classList.remove('active');
-        btnMain.style.display = 'block'; // Mostrar el botón Ver en AR
+    // Lógica dinámica para cualquier botón de opción usando data-attributes
+    optionButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Asignar los archivos
+            archivoGltf = btn.getAttribute('data-glb');
+            linkIos.href = btn.getAttribute('data-usdz');
+            
+            // Gestionar la clase 'active' visualmente
+            optionButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Mostrar el botón principal
+            btnMain.style.display = 'block';
+        });
     });
 
     btnMain.addEventListener('click', () => {
