@@ -118,24 +118,56 @@
         .a-dialog-allow-button:active {
             transform: scale(0.95) !important;
         }
+
+        /* --- Menú de selección --- */
+        .option-button {
+            background: #ffffff;
+            color: #333;
+            border: 2px solid transparent;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .option-button.active {
+            background: #007AFF;
+            color: white;
+            border: 2px solid #ffffff;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
 <body>
     <div id="ui-container">
+        <!-- menú de selección -->
+        <div id="selection-menu" style="pointer-events: auto; text-align: center; margin-bottom: 20px;">
+            <h3 style="color: white; margin-bottom: 15px; font-family: sans-serif; text-shadow: 1px 1px 2px black;">Elige tu modelo:</h3>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="option-button" id="btn-opcion1">Opción 1</button>
+                <button class="option-button" id="btn-opcion2">Opción 2</button>
+            </div>
+        </div>
+
         <!-- texto que va cambiando -->
         <div id="instruction">Mueve el móvil despacio para encontrar el suelo</div>
-        <button id="ar-button">Ver en AR</button>
+        
+        <!-- oculto hasta que se elija una opción -->
+        <button id="ar-button" style="display: none;">Ver en AR</button>
     </div>
 
     <!-- enlace invisible para iphone (usdz) -->
-    <a id="enlace-ios" rel="ar" href="./assets/tu-modelo.usdz" style="display: none;">
+    <a id="enlace-ios" rel="ar" href="#" style="display: none;">
         <img src="" alt="AR">
     </a>
 
     <script>
-        // ruta del modelo (android)
-        const archivoGltf = "./assets/tu-modelo.glb";
+        // ruta del modelo (android) - se asigna al elegir opción
+        let archivoGltf = "";
 
         // comprobar si el sistema es iOS
         function checkIOS() {
@@ -240,6 +272,28 @@
             let linkIos = document.getElementById('enlace-ios');
             let txtInfo = document.getElementById('instruction');
             let mainScene = document.querySelector('a-scene');
+            
+            let btnOp1 = document.getElementById('btn-opcion1');
+            let btnOp2 = document.getElementById('btn-opcion2');
+            let selectionMenu = document.getElementById('selection-menu');
+
+            // Lógica selección Opción 1
+            btnOp1.addEventListener('click', () => {
+                archivoGltf = "./assets/Robot_Happy.glb";
+                linkIos.href = "./assets/Robot_Happy.usdz";
+                btnOp1.classList.add('active');
+                btnOp2.classList.remove('active');
+                btnMain.style.display = 'block'; // Mostrar el botón Ver en AR
+            });
+
+            // Lógica selección Opción 2
+            btnOp2.addEventListener('click', () => {
+                archivoGltf = "./assets/Robot_Headplay.glb";
+                linkIos.href = "./assets/Robot_Headplay.usdz";
+                btnOp2.classList.add('active');
+                btnOp1.classList.remove('active');
+                btnMain.style.display = 'block'; // Mostrar el botón Ver en AR
+            });
 
             btnMain.addEventListener('click', () => {
                 if (checkIOS()) {
@@ -250,6 +304,7 @@
                     if (mainScene.hasLoaded) {
                         mainScene.enterVR(true);
                         btnMain.style.display = 'none';
+                        selectionMenu.style.display = 'none'; // ocultar menu en AR
                         txtInfo.style.display = 'block';
                     }
                 }
@@ -258,6 +313,7 @@
             mainScene.addEventListener('exit-vr', function () {
                 txtInfo.style.display = 'none';
                 btnMain.style.display = 'block';
+                selectionMenu.style.display = 'block'; // mostrar menu al salir
             });
         };
     </script>
