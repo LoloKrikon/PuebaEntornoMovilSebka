@@ -1,26 +1,43 @@
-# Needle Engine
+# Proyecto AR Multplataforma con Needle Engine
 
-This is a Vite-based Needle Engine Sample project.   
-You can [**fork and edit on Stackblitz**](https://stackblitz.com/fork/github/needle-engine/vite-template) directly to try out Needle Engine without any installation.
+Bienvenido al proyecto de Realidad Aumentada desarrollado con **Needle Engine** y **Vite**. Este proyecto implementa un visor web 3D puro (Vanilla JS) capaz de lanzar experiencias AR nativas tanto en dispositivos Android como iOS, resolviendo los problemas comunes de compatibilidad entre navegadores móviles.
 
-[**Open src/main.ts**](./src/main.ts) to start edit the scene.
+## Características Principales
 
-### Samples
-- [Stackblitz Needle Engine Collection](https://stackblitz.com/@marwie/collections/needle-engine)
-- [Stackblitz glTF Progressive Samples](https://stackblitz.com/@marwie/collections/gltf-progressive)
-- [Needle Engine Samples](https://engine.needle.tools/samples)
-- [Needle Engine Documentation](https://docs.needle.tools)
+**Detección Automática de Suelo (Android):** Utiliza WebXR (`autoPlace`) para escanear la habitación y anclar el modelo 3D en superficies reales planas de forma automática.
+**Soporte Nativo iOS (QuickLook):** Inteligencia en el código para detectar si el usuario entra desde un iPhone/iPad, derivándolo dinámicamente al ecosistema QuickLook de Apple mediante un archivo `.usdz`.
+**Interfaz Limpia y Personalizada:** Botón global "Ver en AR" personalizado en HTML/CSS, flotante y libre de botones por defecto intrusivos o enlaces a herramientas de terceros.
+**Empaquetado Optimizado para GitHub Pages:** Configuración avanzada de Vite alterada a propósito (compresión desactivada) para sortear los clásicos errores 404 al alojar archivos web compilados en servidores de GitHub.
 
-Please reach out to us in our [forum](https://forum.needle.tools) if you have any questions or suggestions. Thank you!
+## Tecnologías Utilizadas
 
-# Contributing
+*   [Needle Engine](https://needle.tools/) (`@needle-tools/engine`)
+*   [Vite](https://vitejs.dev/) (Empaquetador y Servidor Local)
+*   **Three.js** (Motor de renderizado interno de Needle)
+*   **TypeScript / Vanilla JavaScript**
+*   **HTML / CSS** estándar sin frameworks adicionales.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz_small.svg)](https://stackblitz.com/~/github.com/needle-engine/vite-template)
+## Estructura de Directorios
 
+El núcleo del código desarrollado por nosotros se encuentra en la carpeta `src/` y en la raíz del proyecto.
 
-# Contact
+*   `index.html`: Punto de entrada que aloja el componente `<needle-engine>`, nuestro botón AR unificado y el script dinámico de detección iOS/Android.
+*   `src/main.ts`: Lógica principal. Configuración del módulo WebXR y scripts de limpieza del DOM/Shadow DOM.
+*   `src/styles/style.css`: Estilos visuales a pantalla completa.
+*   `assets/`: Repositorio de modelos 3D (`.glb` general y `.usdz` para Apple).
+*   `vite.config.js`: Modificado expresamente para permitir el despliegue funcional en GitHub Pages.
 
-<b>[needle — tools for unity](https://needle.tools)</b> • 
-[@NeedleTools](https://twitter.com/NeedleTools) • 
-[Forum](https://forum.needle.tools) • 
-[Youtube](https://www.youtube.com/@needle-tools)
+> Para más detalles explicativos sobre la arquitectura técnica y el uso de cada script, por favor, refiérase al informe de estudio interno que preparó el equipo de desarrollo.
+
+## Cómo Ejecutar en Desarrollo (Local)
+
+1. Abre la terminal en el directorio `PagNeedle/ar-mindar`.
+2. Instala las dependencias del proyecto (solo la primera vez):
+   ```bash
+   npm install
+   ```
+3. Inicia el servidor de pruebas local:
+   ```bash
+   npm run dev
+   ```
+4. Podrás ver y probar la web accediendo a la dirección local que te devuelva la terminal (ej: `http://localhost:3000`).
