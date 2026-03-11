@@ -8,7 +8,7 @@ onStart(context => {
     xr.createQRCode = false;
     xr.createSendToQuestButton = false;
     xr.autoPlace = true;
-    xr.usdzSrc = "./assets/tu-modelo.usdz";
+    // Quitamos xr.usdzSrc para que Needle no cree el botón de Apple, ya que usamos nuestro botón HTML
 });
 
 // quitamos el enlace de needle y botones webxr dobles del DOM
