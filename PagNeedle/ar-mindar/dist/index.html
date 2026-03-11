@@ -16,7 +16,7 @@
   <meta name="og:title" content="Minimal">
   <meta name="generator" content="Needle Engine for Unity 3.5.9-pre.2">
   <meta name="needle-engine" content="4.15.0">
-  <meta name="needle:buildtime" content="2026-03-11T09:18:35.168Z">
+  <meta name="needle:buildtime" content="2026-03-11T09:30:42.415Z">
 
     <meta charset="UTF-8" />
     <link rel="icon" href="./assets/favicon.8d99ceea.ico">
@@ -24,11 +24,12 @@
     <title>Minimal</title>
     
     <style>
-        /* botón de AR movido a la izquierda para no taparse con el original */
+        /* botón de AR centrado, pero más arriba para no pisar al de Needle */
         #boton-ar {
             position: fixed;
-            bottom: 30px;
-            left: 20px; /* Anclado a la izquierda */
+            bottom: 90px; /* Suficientemente alto para no pisar el otro botón */
+            left: 50%;
+            transform: translateX(-50%); /* Dando el centrado perfecto */
             z-index: 999999;
             background: #007AFF;
             color: white;
@@ -45,7 +46,7 @@
             transform: translateX(-50%) scale(0.95);
         }
     </style>
-  <script type="module" crossorigin src="./assets/index-cfe7258e.js"></script>
+  <script type="module" crossorigin src="./assets/index-d50068e8.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/three@0.169.19.js">
   <link rel="modulepreload" crossorigin href="./assets/three-mesh-ui.4389046e.js">
   <link rel="modulepreload" crossorigin href="./assets/three-examples.11827c3b.js">

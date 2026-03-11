@@ -8,11 +8,12 @@
     <title>AR con Needle Engine</title>
     <link rel="stylesheet" href="./src/styles/style.css">
     <style>
-        /* botón de AR movido a la izquierda para no taparse con el original */
+        /* botón de AR centrado, pero más arriba para no pisar al de Needle */
         #boton-ar {
             position: fixed;
-            bottom: 30px;
-            left: 20px; /* Anclado a la izquierda */
+            bottom: 90px; /* Suficientemente alto para no pisar el otro botón */
+            left: 50%;
+            transform: translateX(-50%); /* Dando el centrado perfecto */
             z-index: 999999;
             background: #007AFF;
             color: white;
