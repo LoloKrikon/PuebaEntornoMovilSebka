@@ -34,28 +34,22 @@ AFRAME.registerComponent('hit-test-handler', {
             });
 
             sess.addEventListener('select', () => {
-                // si el anillo se esta viendo y no hemos puesto aun el modelo 3d
                 if (ctx.el.getAttribute('visible') && !ctx.modeloPuesto) {
-
-                    // creamos la entidad 3d
                     let modelObj = document.createElement('a-entity');
                     modelObj.setAttribute('gltf-model', archivoGltf);
                     modelObj.setAttribute('position', ctx.el.getAttribute('position'));
                     
-                    // reducimos el tamaño porque el archivo que te mandaron es gigante (2%)
-                    modelObj.setAttribute('scale', '0.02 0.02 0.02');
+                    // Aseguramos tamaño original (los castillos deberían venir bien escalados)
+                    modelObj.setAttribute('scale', '1 1 1');
                     
-                    // activamos las animaciones para que el robot se mueva en bucle
                     modelObj.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
 
-                    // lo añadimos a la escena
                     ctx.el.sceneEl.appendChild(modelObj);
                     ctx.modeloPuesto = true;
 
                     ctx.el.setAttribute('visible', 'false');
-                    txtInfo.innerText = "¡Ya está!";
+                    txtInfo.innerText = "¡Colocado!";
 
-                    // quitar mensaje a los 2 segundos
                     setTimeout(() => { txtInfo.style.display = 'none'; }, 2000);
                 }
             });
