@@ -7,13 +7,13 @@ export default defineConfig(async ({ command }) => {
     return {
         base: "./",
         plugins: [
-            useGzip(needleConfig) ? viteCompression({ deleteOriginFile: true }) : null,
+            // gzip desactivado para que funcione en github pages sin servidor especial
             needlePlugins(command, needleConfig, { noPoster: true, allowHotReload: false }),
         ],
         server: {
             https: false,
             proxy: {
-              'https://localhost:3000': 'https://localhost:3000',
+                'https://localhost:3000': 'https://localhost:3000',
             },
             strictPort: true,
             port: 3000,
