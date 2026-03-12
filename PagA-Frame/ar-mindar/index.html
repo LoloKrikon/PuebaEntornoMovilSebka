@@ -19,11 +19,15 @@
         <!-- menú de selección -->
         <div id="selection-menu" style="pointer-events: auto; text-align: center; margin-bottom: 20px;">
             <h3 style="color: white; margin-bottom: 15px; font-family: sans-serif; text-shadow: 1px 1px 2px black;">Elige tu modelo:</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; margin-bottom: 10px;">
                 <button class="option-button" id="btn-alanis" data-glb="./assets/GLB/CastilloAlanisBAKE.glb" data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz">Castillo Alanís</button>
                 <button class="option-button" id="btn-constantina" data-glb="./assets/GLB/CastilloConstantinaBAKE.glb" data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz">Castillo Constantina</button>
                 <button class="option-button" id="btn-victoria" data-glb="./assets/GLB/TorreVictoriaBAKE.glb" data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz">Torre Victoria</button>
                 <button class="option-button" id="btn-equipacion" data-glb="./assets/GLB/Equipacion.glb" data-usdz="./assets/USDZ/Equipacion.usdz">Equipación</button>
+            </div>
+            <!-- Botón extra para probar la animación usando modelos públicos de Khronos y Apple -->
+            <div style="display: flex; justify-content: center; padding: 0 15px;">
+                <button class="option-button" style="background: #34C759; color: white; border: 2px solid white; width: 100%;" id="btn-animado" data-glb="./assets/GLB/Fox.glb" data-usdz="./assets/USDZ/toy_drummer.usdz">🦊 Prueba: Animación</button>
             </div>
         </div>
 
