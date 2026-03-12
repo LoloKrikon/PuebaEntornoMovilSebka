@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Proyectos AR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        p {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .card {
+            display: block;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 22px 20px;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.15s, border-color 0.15s;
+        }
+
+        .card:active {
+            background-color: #2a2a2a;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .card span {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-blue { background-color: #1565c0; color: #fff; }
+        .tag-green { background-color: #2e7d32; color: #fff; }
+        .tag-orange { background-color: #e65100; color: #fff; }
+
+        footer {
+            margin-top: 50px;
+            color: #444;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Proyectos de Realidad Aumentada</h1>
+    <p>Elige el proyecto que quieres abrir</p>
+
+    <div class="cards">
+
+        <a class="card" href="./PagA-Frame/ar-mindar/index.html">
+            <div class="tag tag-blue">A-Frame + WebXR</div>
+            <h2>Proyecto A-Frame</h2>
+            <span>Modelos 3D anclados al suelo en realidad aumentada sin marcadores</span>
+        </a>
+
+        <a class="card" href="./PagNeedle/ar-mindar/dist/index.html">
+            <div class="tag tag-green">Needle Engine</div>
+            <h2>Proyecto Needle</h2>
+            <span>Experiencia AR con motor gráfico avanzado basado en Three.js</span>
+        </a>
+
+        <a class="card" href="./PagEscEnara/ar-mindar/index.html">
+            <div class="tag tag-orange">AR.js + MindAR</div>
+            <h2>Proyecto Escaner AR-Mindar</h2>
+            <span>Realidad aumentada con reconocimiento de imagen mediante marcador</span>
+        </a>
+
+    </div>
+
+    <footer>Proyectos de clase · 2025</footer>
+
+</body>
+
+</html>
