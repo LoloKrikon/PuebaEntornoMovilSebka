@@ -54,6 +54,7 @@
     <!-- configuramos webxr para q pida el hit-test y superponga el div de los botones, además traducimos la ventana de permisos al español -->
     <a-scene webxr="requiredFeatures: hit-test, local; optionalFeatures: dom-overlay; overlayElement: #ui-container"
         xr-mode-ui="enabled: false"
+        background="color: transparent; transparent: true"
         device-orientation-permission-ui="allowButtonText: Permitir; denyButtonText: Denegar; cancelButtonText: Cancelar; deviceMotionMessage: Esta experiencia necesita acceder a los sensores de movimiento para colocar objetos en tu entorno.">
 
         <a-camera position="0 1.6 0"></a-camera>
