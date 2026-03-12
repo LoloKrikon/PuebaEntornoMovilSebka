@@ -108,22 +108,69 @@ html {
 }
 
 /* --- Menú de selección --- */
+.menu-container {
+    pointer-events: auto;
+    text-align: center;
+    margin-bottom: 25px;
+    background: rgba(30, 30, 30, 0.85); /* Un fondo oscuro simple */
+    padding: 20px;
+    border-radius: 8px; /* Un poco menos redondeado */
+    width: 85%;
+    max-width: 400px;
+}
+
+.menu-container h3 {
+    color: white;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-family: Arial, sans-serif;
+    text-decoration: underline; /* Detalle de diseño más "old school" */
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
 .option-button {
-    background: #ffffff;
+    background-color: #e0e0e0;
     color: #333;
-    border: 2px solid transparent;
-    padding: 12px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 15px;
+    border: 2px solid #555;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 4px; /* Bordes casi rectos, muy programador estándar */
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transition: all 0.2s;
+    box-shadow: 2px 2px 0px #000; /* Sombra sólida clásica, no difuminada y perfecta */
+    transition: background-color 0.1s;
+}
+
+.option-button:active {
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+    transform: translateY(2px);
 }
 
 .option-button.active {
-    background: #007AFF;
+    background-color: #1e88e5; /* Azul menos vibrante */
     color: white;
-    border: 2px solid #ffffff;
-    transform: scale(1.05);
+    border: 2px solid white;
+}
+
+.test-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    border-top: 1px dashed #777;
+    padding-top: 15px;
+}
+
+.btn-test {
+    background-color: #2e7d32; /* Verde simple oscuro */
+    color: white;
+    width: 100%;
+}
+.btn-test.active {
+    background-color: #1b5e20;
 }

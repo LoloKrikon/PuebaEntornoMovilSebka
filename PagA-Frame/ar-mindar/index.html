@@ -17,23 +17,28 @@
 <body>
     <div id="ui-container">
         <!-- menú de selección -->
-        <div id="selection-menu" style="pointer-events: auto; text-align: center; margin-bottom: 20px;">
-            <h3 style="color: white; margin-bottom: 15px; font-family: sans-serif; text-shadow: 1px 1px 2px black;">Elige tu modelo:</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; margin-bottom: 10px;">
-                <button class="option-button" id="btn-alanis" data-glb="./assets/GLB/CastilloAlanisBAKE.glb" data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz">Castillo Alanís</button>
-                <button class="option-button" id="btn-constantina" data-glb="./assets/GLB/CastilloConstantinaBAKE.glb" data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz">Castillo Constantina</button>
-                <button class="option-button" id="btn-victoria" data-glb="./assets/GLB/TorreVictoriaBAKE.glb" data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz">Torre Victoria</button>
-                <button class="option-button" id="btn-equipacion" data-glb="./assets/GLB/Equipacion.glb" data-usdz="./assets/USDZ/Equipacion.usdz">Equipación</button>
+        <div id="selection-menu" class="menu-container">
+            <h3>Elige tu modelo:</h3>
+            <div class="options-grid">
+                <button class="option-button" id="btn-alanis" data-glb="./assets/GLB/CastilloAlanisBAKE.glb"
+                    data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz">Castillo Alanís</button>
+                <button class="option-button" id="btn-constantina" data-glb="./assets/GLB/CastilloConstantinaBAKE.glb"
+                    data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz">Castillo Constantina</button>
+                <button class="option-button" id="btn-victoria" data-glb="./assets/GLB/TorreVictoriaBAKE.glb"
+                    data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz">Torre Victoria</button>
+                <button class="option-button" id="btn-equipacion" data-glb="./assets/GLB/Equipacion.glb"
+                    data-usdz="./assets/USDZ/Equipacion.usdz">Equipación</button>
             </div>
-            <!-- Botón extra para probar la animación usando modelos públicos de Khronos y Apple -->
-            <div style="display: flex; justify-content: center; padding: 0 15px;">
-                <button class="option-button" style="background: #34C759; color: white; border: 2px solid white; width: 100%;" id="btn-animado" data-glb="./assets/GLB/Fox.glb" data-usdz="./assets/USDZ/toy_drummer.usdz">🦊 Prueba: Animación</button>
+
+            <div class="test-container">
+                <button class="option-button btn-test" id="btn-animado" data-glb="./assets/GLB/Fox.glb"
+                    data-usdz="./assets/USDZ/toy_drummer.usdz">Prueba Animación</button>
             </div>
         </div>
 
         <!-- texto que va cambiando -->
         <div id="instruction">Mueve el móvil despacio para encontrar el suelo</div>
-        
+
         <!-- oculto hasta que se elija una opción -->
         <button id="ar-button" style="display: none;">Ver en AR</button>
     </div>
@@ -57,7 +62,7 @@
         <a-light type="ambient" intensity="0.6"></a-light>
         <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
 
-        <!-- el circulito / diana donde se va a colocar el modelo -->
+        <!-- el circulito donde se va a colocar el modelo -->
         <a-entity hit-test-handler visible="false">
             <a-ring color="#00ffff" radius-inner="0.1" radius-outer="0.15" rotation="-90 0 0" opacity="0.8"></a-ring>
         </a-entity>
