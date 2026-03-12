@@ -112,65 +112,66 @@ html {
     pointer-events: auto;
     text-align: center;
     margin-bottom: 25px;
-    background: rgba(30, 30, 30, 0.85); /* Un fondo oscuro simple */
-    padding: 20px;
-    border-radius: 8px; /* Un poco menos redondeado */
+    background: rgba(20, 20, 20, 0.75);
+    padding: 18px 16px;
+    border-radius: 12px;
     width: 85%;
     max-width: 400px;
+    border: 1px solid rgba(255,255,255,0.15);
 }
 
 .menu-container h3 {
-    color: white;
+    color: #eee;
     margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.1rem;
+    margin-bottom: 12px;
+    font-size: 1rem;
     font-family: Arial, sans-serif;
-    text-decoration: underline; /* Detalle de diseño más "old school" */
+    letter-spacing: 0.5px;
 }
 
 .options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .option-button {
-    background-color: #e0e0e0;
-    color: #333;
-    border: 2px solid #555;
-    padding: 10px;
-    font-size: 15px;
-    border-radius: 4px; /* Bordes casi rectos, muy programador estándar */
+    background-color: #f0f0f0;
+    color: #222;
+    border: 1px solid #aaa;
+    padding: 10px 8px;
+    font-size: 13px;
+    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 2px 2px 0px #000; /* Sombra sólida clásica, no difuminada y perfecta */
-    transition: background-color 0.1s;
+    transition: background-color 0.15s;
 }
 
 .option-button:active {
-    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
-    transform: translateY(2px);
+    background-color: #ccc;
 }
 
 .option-button.active {
-    background-color: #1e88e5; /* Azul menos vibrante */
+    background-color: #2979ff;
     color: white;
-    border: 2px solid white;
+    border-color: #2979ff;
 }
 
 .test-container {
     display: flex;
     justify-content: center;
-    margin-top: 15px;
-    border-top: 1px dashed #777;
-    padding-top: 15px;
+    margin-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 12px;
 }
 
 .btn-test {
-    background-color: #2e7d32; /* Verde simple oscuro */
+    background-color: #388e3c;
     color: white;
     width: 100%;
+    border-color: #388e3c;
 }
+
 .btn-test.active {
     background-color: #1b5e20;
 }
