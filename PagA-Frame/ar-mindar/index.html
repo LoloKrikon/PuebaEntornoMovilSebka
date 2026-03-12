@@ -20,24 +20,40 @@
         <div id="selection-menu" class="menu-container">
             <h3>Elige tu modelo:</h3>
             <div class="options-grid">
-                <button class="option-button" id="btn-alanis" data-glb="./assets/GLB/CastilloAlanisBAKE.glb"
-                    data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz">Castillo Alanís</button>
-                <button class="option-button" id="btn-constantina" data-glb="./assets/GLB/CastilloConstantinaBAKE.glb"
-                    data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz">Castillo Constantina</button>
-                <button class="option-button" id="btn-victoria" data-glb="./assets/GLB/TorreVictoriaBAKE.glb"
-                    data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz">Torre Victoria</button>
-                <button class="option-button" id="btn-equipacion" data-glb="./assets/GLB/Equipacion.glb"
-                    data-usdz="./assets/USDZ/Equipacion.usdz">Equipación</button>
+                <button class="option-button" id="btn-alanis"
+                    data-glb="./assets/GLB/CastilloAlanisBAKE.glb"
+                    data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz"
+                    data-scale="1 1 1">Castillo Alanís</button>
+                <button class="option-button" id="btn-constantina"
+                    data-glb="./assets/GLB/CastilloConstantinaBAKE.glb"
+                    data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz"
+                    data-scale="1 1 1">Castillo Constantina</button>
+                <button class="option-button" id="btn-victoria"
+                    data-glb="./assets/GLB/TorreVictoriaBAKE.glb"
+                    data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz"
+                    data-scale="1 1 1">Torre Victoria</button>
+                <button class="option-button" id="btn-equipacion"
+                    data-glb="./assets/GLB/Equipacion.glb"
+                    data-usdz="./assets/USDZ/Equipacion.usdz"
+                    data-scale="1 1 1">Equipación</button>
             </div>
 
             <div class="test-container">
-                <button class="option-button btn-test" id="btn-animado" data-glb="./assets/GLB/Fox.glb"
-                    data-usdz="./assets/USDZ/toy_drummer.usdz">Prueba Animación</button>
+                <button class="option-button btn-test" id="btn-animado"
+                    data-glb="./assets/GLB/Fox.glb"
+                    data-usdz="./assets/USDZ/toy_drummer.usdz"
+                    data-scale="0.02 0.02 0.02">Prueba Animación</button>
             </div>
         </div>
 
         <!-- texto que va cambiando -->
         <div id="instruction">Mueve el móvil despacio para encontrar el suelo</div>
+
+        <!-- texto de carga -->
+        <div id="loading-text">Cargando...</div>
+
+        <!-- botón para quitar el modelo y volver a colocar otro -->
+        <button id="reset-button">Reiniciar</button>
 
         <!-- oculto hasta que se elija una opción -->
         <button id="ar-button" style="display: none;">Ver en AR</button>

@@ -1,7 +1,6 @@
-// ruta del modelo (android) - se asigna al elegir opción
 let archivoGltf = "";
+let escalaModelo = "1 1 1";
 
-// comprobar si el sistema es iOS
 function checkIOS() {
     return [
         'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'
@@ -10,18 +9,23 @@ function checkIOS() {
         || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
-// componente hecho a mano para colocar el objeto donde toca la persona
 AFRAME.registerComponent('hit-test-handler', {
     init: function () {
         let ctx = this;
         this.hitSource = null;
         this.localSpace = null;
         this.modeloPuesto = false;
+        this.modeloActual = null;
 
         let txtInfo = document.getElementById('instruction');
+        let txtCargando = document.getElementById('loading-text');
+        let btnReset = document.getElementById('reset-button');
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
             let sess = this.el.sceneEl.renderer.xr.getSession();
+
+            // ocultamos el texto de cargando cuando ya estamos dentro
+            txtCargando.style.display = 'none';
 
             sess.requestReferenceSpace('viewer').then((space) => {
                 sess.requestHitTestSource({ space: space }).then((source) => {
@@ -38,17 +42,18 @@ AFRAME.registerComponent('hit-test-handler', {
                     let modelObj = document.createElement('a-entity');
                     modelObj.setAttribute('gltf-model', archivoGltf);
                     modelObj.setAttribute('position', ctx.el.getAttribute('position'));
-                    
-                    // Aseguramos tamaño original (los castillos deberían venir bien escalados)
-                    modelObj.setAttribute('scale', '1 1 1');
-                    
+                    modelObj.setAttribute('scale', escalaModelo);
                     modelObj.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
 
                     ctx.el.sceneEl.appendChild(modelObj);
+                    ctx.modeloActual = modelObj;
                     ctx.modeloPuesto = true;
 
                     ctx.el.setAttribute('visible', 'false');
                     txtInfo.innerText = "¡Colocado!";
+
+                    // mostramos el botón de reiniciar
+                    btnReset.style.display = 'block';
 
                     setTimeout(() => { txtInfo.style.display = 'none'; }, 2000);
                 }
@@ -56,21 +61,38 @@ AFRAME.registerComponent('hit-test-handler', {
         });
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionend', () => {
-            // cuando cerramos el ar reseteamos cosas
             ctx.hitSource = null;
             txtInfo.style.display = 'none';
+            txtCargando.style.display = 'none';
+            btnReset.style.display = 'none';
             document.getElementById('ar-button').style.display = 'block';
             ctx.modeloPuesto = false;
+            ctx.modeloActual = null;
+        });
+
+        // lógica del botón reiniciar
+        btnReset.addEventListener('click', () => {
+            // borramos el modelo que había puesto el usuario
+            if (ctx.modeloActual) {
+                ctx.el.sceneEl.removeChild(ctx.modeloActual);
+                ctx.modeloActual = null;
+            }
+
+            // reseteamos el estado para que pueda volver a colocar
+            ctx.modeloPuesto = false;
+            ctx.el.setAttribute('visible', 'false');
+
+            btnReset.style.display = 'none';
+            txtInfo.innerText = "Mueve el móvil despacio para encontrar el suelo";
+            txtInfo.style.display = 'block';
         });
     },
 
     tick: function () {
-        // si ya lo hemos puesto no hacemos nada mas
         if (this.modeloPuesto) return;
 
         let txtInfo = document.getElementById('instruction');
 
-        // si estamos dentro de ar buscando el hit
         if (this.el.sceneEl.is('ar-mode')) {
             if (!this.hitSource || !this.localSpace) return;
 
@@ -80,16 +102,13 @@ AFRAME.registerComponent('hit-test-handler', {
             let hits = currentFrame.getHitTestResults(this.hitSource);
 
             if (hits.length > 0) {
-                // pillamos la posicion en el plano
                 let pose = hits[0].getPose(this.localSpace);
 
-                // enseñamos el anillo
                 this.el.setAttribute('visible', 'true');
                 this.el.setAttribute('position', pose.transform.position);
 
                 txtInfo.innerText = "Toca para poner el modelo";
             } else {
-                // si no hay plano ocultamos el anillo
                 this.el.setAttribute('visible', 'false');
                 txtInfo.innerText = "Buscando el suelo...";
             }
@@ -97,50 +116,48 @@ AFRAME.registerComponent('hit-test-handler', {
     }
 });
 
-// al cargar la pagina preparamos botones
 window.onload = () => {
     let btnMain = document.getElementById('ar-button');
     let linkIos = document.getElementById('enlace-ios');
     let txtInfo = document.getElementById('instruction');
+    let txtCargando = document.getElementById('loading-text');
     let mainScene = document.querySelector('a-scene');
-    
     let selectionMenu = document.getElementById('selection-menu');
     let optionButtons = document.querySelectorAll('.option-button');
 
-    // Lógica dinámica para cualquier botón de opción usando data-attributes
     optionButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Asignar los archivos
             archivoGltf = btn.getAttribute('data-glb');
             linkIos.href = btn.getAttribute('data-usdz');
-            
-            // Gestionar la clase 'active' visualmente
+            escalaModelo = btn.getAttribute('data-scale') || '1 1 1';
+
             optionButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
-            // Mostrar el botón principal
+
             btnMain.style.display = 'block';
         });
     });
 
     btnMain.addEventListener('click', () => {
         if (checkIOS()) {
-            // en apple forzamos click al enlace usdz
             linkIos.click();
         } else {
-            // en android le decimos a aframe que abra el webxr
             if (mainScene.hasLoaded) {
                 mainScene.enterVR(true);
                 btnMain.style.display = 'none';
-                selectionMenu.style.display = 'none'; // ocultar menu en AR
+                selectionMenu.style.display = 'none';
                 txtInfo.style.display = 'block';
+
+                // mostramos cargando mientras arranca la sesión AR
+                txtCargando.style.display = 'block';
             }
         }
     });
 
     mainScene.addEventListener('exit-vr', function () {
         txtInfo.style.display = 'none';
+        txtCargando.style.display = 'none';
         btnMain.style.display = 'block';
-        selectionMenu.style.display = 'block'; // mostrar menu al salir
+        selectionMenu.style.display = 'block';
     });
 };

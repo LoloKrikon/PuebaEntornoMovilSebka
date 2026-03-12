@@ -52,6 +52,33 @@ html {
     display: none;
 }
 
+#loading-text {
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    display: none;
+}
+
+#reset-button {
+    pointer-events: auto;
+    background: #cc3333;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    font-size: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    display: none;
+}
+
+#reset-button:active {
+    background: #aa2222;
+}
+
 .a-enter-vr {
     display: none !important;
 }
