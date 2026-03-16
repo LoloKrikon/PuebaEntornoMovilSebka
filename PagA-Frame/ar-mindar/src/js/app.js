@@ -33,8 +33,12 @@ AFRAME.registerComponent('hit-test-handler', {
                 });
             });
 
-            sess.requestReferenceSpace('local').then((space) => {
+            sess.requestReferenceSpace('local-floor').then((space) => {
                 ctx.localSpace = space;
+            }).catch(() => {
+                sess.requestReferenceSpace('local').then((space) => {
+                    ctx.localSpace = space;
+                });
             });
 
             sess.addEventListener('select', () => {
