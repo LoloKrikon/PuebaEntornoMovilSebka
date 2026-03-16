@@ -74,7 +74,6 @@ AFRAME.registerComponent('hit-test-handler', {
 
         let txtInfo = document.getElementById('instruction');
         let txtCargando = document.getElementById('loading-text');
-        let btnReset = document.getElementById('reset-button');
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
             let sess = this.el.sceneEl.renderer.xr.getSession();
@@ -114,7 +113,6 @@ AFRAME.registerComponent('hit-test-handler', {
 
                     ctx.el.setAttribute('visible', 'false');
                     txtInfo.innerText = "¡Colocado! Usa 1 dedo para rotar y 2 para escala";
-                    btnReset.style.display = 'block';
 
                     setTimeout(() => { txtInfo.style.display = 'none'; }, 4000);
                 }
@@ -125,22 +123,9 @@ AFRAME.registerComponent('hit-test-handler', {
             ctx.hitSource = null;
             txtInfo.style.display = 'none';
             txtCargando.style.display = 'none';
-            btnReset.style.display = 'none';
             document.getElementById('ar-button').style.display = 'block';
             ctx.modeloPuesto = false;
             ctx.modeloActual = null;
-        });
-
-        btnReset.addEventListener('click', () => {
-            if (ctx.modeloActual) {
-                ctx.el.sceneEl.removeChild(ctx.modeloActual);
-                ctx.modeloActual = null;
-            }
-            ctx.modeloPuesto = false;
-            ctx.el.setAttribute('visible', 'false');
-            btnReset.style.display = 'none';
-            txtInfo.innerText = "Busca el suelo con la cámara";
-            txtInfo.style.display = 'block';
         });
     },
 
