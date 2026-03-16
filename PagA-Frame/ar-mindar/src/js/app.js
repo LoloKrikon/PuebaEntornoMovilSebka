@@ -9,13 +9,15 @@ function checkIOS() {
         || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
-// Componente para rotar el modelo con el dedo
+// COMPONENTE DE GESTOS AVANZADOS (Rotar, Escalar y Mover)
 AFRAME.registerComponent('gesture-handler', {
     init: function () {
         this.handleTouchMove = this.handleTouchMove.bind(this);
         this.handleTouchStart = this.handleTouchStart.bind(this);
         this.lastTouchX = 0;
-        
+        this.initialDistance = 0;
+        this.initialScale = 1;
+
         window.addEventListener('touchstart', this.handleTouchStart);
         window.addEventListener('touchmove', this.handleTouchMove);
     },
@@ -26,18 +28,38 @@ AFRAME.registerComponent('gesture-handler', {
     handleTouchStart: function(evt) {
         if (evt.touches.length === 1) {
             this.lastTouchX = evt.touches[0].pageX;
+        } else if (evt.touches.length === 2) {
+            this.initialDistance = this.getDistance(evt.touches);
+            this.initialScale = this.el.getAttribute('scale').x;
         }
     },
+    getDistance: function(touches) {
+        let dx = touches[0].pageX - touches[1].pageX;
+        let dy = touches[0].pageY - touches[1].pageY;
+        return Math.sqrt(dx * dx + dy * dy);
+    },
     handleTouchMove: function (evt) {
-        if (evt.touches.length === 1 && this.el.sceneEl.is('ar-mode')) {
+        if (!this.el.sceneEl.is('ar-mode')) return;
+
+        if (evt.touches.length === 1) {
+            // ROTACIÓN (1 dedo)
             let touchX = evt.touches[0].pageX;
             let deltaX = touchX - this.lastTouchX;
             this.lastTouchX = touchX;
 
-            // Rotamos la entidad sobre el eje Y
             let rotation = this.el.getAttribute('rotation');
             rotation.y += deltaX * 0.5;
             this.el.setAttribute('rotation', rotation);
+            
+        } else if (evt.touches.length === 2) {
+            // ESCALADO / PINCH (2 dedos)
+            let currentDistance = this.getDistance(evt.touches);
+            let factor = currentDistance / this.initialDistance;
+            let newScale = this.initialScale * factor;
+            
+            // Limitamos un poco la escala para que no desaparezca ni sea infinito
+            newScale = Math.min(Math.max(newScale, 0.00001), 2);
+            this.el.setAttribute('scale', {x: newScale, y: newScale, z: newScale});
         }
     }
 });
@@ -72,15 +94,18 @@ AFRAME.registerComponent('hit-test-handler', {
                 });
             });
 
-            sess.addEventListener('select', () => {
+            sess.addEventListener('select', (evt) => {
+                // Solo ponemos el modelo si NO hay ya uno puesto
                 if (ctx.el.getAttribute('visible') && !ctx.modeloPuesto) {
                     let modelObj = document.createElement('a-entity');
                     modelObj.setAttribute('gltf-model', archivoGltf);
                     modelObj.setAttribute('position', ctx.el.getAttribute('position'));
-                    modelObj.setAttribute('scale', escalaModelo);
-                    modelObj.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
                     
-                    // Añadimos el componente de rotación táctil
+                    // Convertimos la string de escala del botón a objeto de A-Frame
+                    let s = escalaModelo.split(' ');
+                    modelObj.setAttribute('scale', {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])});
+                    
+                    modelObj.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
                     modelObj.setAttribute('gesture-handler', '');
 
                     ctx.el.sceneEl.appendChild(modelObj);
@@ -88,10 +113,10 @@ AFRAME.registerComponent('hit-test-handler', {
                     ctx.modeloPuesto = true;
 
                     ctx.el.setAttribute('visible', 'false');
-                    txtInfo.innerText = "¡Colocado! Desliza para rotar";
+                    txtInfo.innerText = "¡Colocado! Usa 1 dedo para rotar y 2 para escala";
                     btnReset.style.display = 'block';
 
-                    setTimeout(() => { txtInfo.style.display = 'none'; }, 3000);
+                    setTimeout(() => { txtInfo.style.display = 'none'; }, 4000);
                 }
             });
         });
@@ -114,7 +139,7 @@ AFRAME.registerComponent('hit-test-handler', {
             ctx.modeloPuesto = false;
             ctx.el.setAttribute('visible', 'false');
             btnReset.style.display = 'none';
-            txtInfo.innerText = "Mueve el móvil para buscar el suelo";
+            txtInfo.innerText = "Busca el suelo con la cámara";
             txtInfo.style.display = 'block';
         });
     },
@@ -136,7 +161,7 @@ AFRAME.registerComponent('hit-test-handler', {
                 txtInfo.innerText = "Toca para poner el modelo";
             } else {
                 this.el.setAttribute('visible', 'false');
-                txtInfo.innerText = "Buscando el suelo...";
+                txtInfo.innerText = "Buscando superficie plana...";
             }
         }
     }
