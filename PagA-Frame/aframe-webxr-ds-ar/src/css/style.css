@@ -175,13 +175,76 @@ html {
     padding-top: 12px;
 }
 
-.btn-test {
-    background-color: #388e3c;
-    color: white;
-    width: 100%;
-    border-color: #388e3c;
-}
-
 .btn-test.active {
     background-color: #1b5e20;
+}
+
+/* --- Ficha informativa y botón 'i' --- */
+.info-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 20px;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 300px;
+    z-index: 1000;
+    pointer-events: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.info-card h4 {
+    margin: 0 0 10px 0;
+    color: #007AFF;
+    font-size: 1.2rem;
+}
+
+.info-card p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #444;
+}
+
+#close-info {
+    background: #007AFF;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#info-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 35px;
+    height: 35px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: 1.5px solid white;
+    border-radius: 50%;
+    font-size: 18px;
+    font-family: "Times New Roman", serif;
+    font-style: italic;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+#info-button:active {
+    background: rgba(255, 255, 255, 0.3);
 }

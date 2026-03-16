@@ -1,5 +1,7 @@
 let modeloUrl = "";
 let escalaActual = "1 1 1";
+let nombreActual = "";
+let infoActual = "";
 
 // para saber si es iphone o no
 function esApple() {
@@ -156,6 +158,9 @@ AFRAME.registerComponent('hit-test-handler', {
 // al cargar la pagina
 window.onload = () => {
     let btnVer = document.getElementById('ar-button');
+    let btnInfo = document.getElementById('info-button');
+    let cardInfo = document.getElementById('info-card');
+    let btnCerrarInfo = document.getElementById('close-info');
     let iosLink = document.getElementById('enlace-ios');
     let info = document.getElementById('instruction');
     let loading = document.getElementById('loading-text');
@@ -168,11 +173,28 @@ window.onload = () => {
             modeloUrl = b.getAttribute('data-glb');
             iosLink.href = b.getAttribute('data-usdz');
             escalaActual = b.getAttribute('data-scale') || '1 1 1';
+            
+            // guardamos info para la ficha
+            nombreActual = b.innerText;
+            infoActual = b.getAttribute('data-info');
 
             botones.forEach(btn => btn.classList.remove('active'));
             b.classList.add('active');
             btnVer.style.display = 'block';
+            
+            // mostramos el boton info por si quiere leer antes de entrar
+            btnInfo.style.display = 'flex';
         });
+    });
+
+    btnInfo.addEventListener('click', () => {
+        document.getElementById('info-title').innerText = nombreActual;
+        document.getElementById('info-text').innerText = infoActual;
+        cardInfo.style.display = 'block';
+    });
+
+    btnCerrarInfo.addEventListener('click', () => {
+        cardInfo.style.display = 'none';
     });
 
     btnVer.addEventListener('click', () => {
@@ -194,5 +216,7 @@ window.onload = () => {
         loading.style.display = 'none';
         btnVer.style.display = 'block';
         menu.style.display = 'block';
+        btnInfo.style.display = 'block';
+        cardInfo.style.display = 'none';
     });
 };
