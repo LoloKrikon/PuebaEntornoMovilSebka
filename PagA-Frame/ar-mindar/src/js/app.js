@@ -1,7 +1,8 @@
-let archivoGltf = "";
-let escalaModelo = "1 1 1";
+let modeloUrl = "";
+let escalaActual = "1 1 1";
 
-function checkIOS() {
+// para saber si es iphone o no
+function esApple() {
     return [
         'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'
     ].includes(navigator.platform)
@@ -9,188 +10,189 @@ function checkIOS() {
         || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
 }
 
-// COMPONENTE DE GESTOS AVANZADOS (Rotar, Escalar y Mover)
-AFRAME.registerComponent('gesture-handler', {
+// aqui va el tema de mover y girar el modelo con los dedos
+AFRAME.registerComponent('gestos', {
     init: function () {
-        this.handleTouchMove = this.handleTouchMove.bind(this);
-        this.handleTouchStart = this.handleTouchStart.bind(this);
-        this.lastTouchX = 0;
-        this.initialDistance = 0;
-        this.initialScale = 1;
+        this.moverDedo = this.moverDedo.bind(this);
+        this.inicioToque = this.inicioToque.bind(this);
+        this.xAnterior = 0;
+        this.distanciaInicial = 0;
+        this.escalaInicial = 1;
 
-        window.addEventListener('touchstart', this.handleTouchStart);
-        window.addEventListener('touchmove', this.handleTouchMove);
+        window.addEventListener('touchstart', this.inicioToque);
+        window.addEventListener('touchmove', this.moverDedo);
     },
     remove: function() {
-        window.removeEventListener('touchstart', this.handleTouchStart);
-        window.removeEventListener('touchmove', this.handleTouchMove);
+        window.removeEventListener('touchstart', this.inicioToque);
+        window.removeEventListener('touchmove', this.moverDedo);
     },
-    handleTouchStart: function(evt) {
-        if (evt.touches.length === 1) {
-            this.lastTouchX = evt.touches[0].pageX;
-        } else if (evt.touches.length === 2) {
-            this.initialDistance = this.getDistance(evt.touches);
-            this.initialScale = this.el.getAttribute('scale').x;
+    inicioToque: function(e) {
+        if (e.touches.length === 1) {
+            this.xAnterior = e.touches[0].pageX;
+        } else if (e.touches.length === 2) {
+            this.distanciaInicial = this.getDist(e.touches);
+            this.escalaInicial = this.el.getAttribute('scale').x;
         }
     },
-    getDistance: function(touches) {
-        let dx = touches[0].pageX - touches[1].pageX;
-        let dy = touches[0].pageY - touches[1].pageY;
+    getDist: function(t) {
+        let dx = t[0].pageX - t[1].pageX;
+        let dy = t[0].pageY - t[1].pageY;
         return Math.sqrt(dx * dx + dy * dy);
     },
-    handleTouchMove: function (evt) {
+    moverDedo: function (e) {
         if (!this.el.sceneEl.is('ar-mode')) return;
 
-        if (evt.touches.length === 1) {
-            // ROTACIÓN (1 dedo)
-            let touchX = evt.touches[0].pageX;
-            let deltaX = touchX - this.lastTouchX;
-            this.lastTouchX = touchX;
+        if (e.touches.length === 1) {
+            // rotar (1 dedo)
+            let xToque = e.touches[0].pageX;
+            let diffX = xToque - this.xAnterior;
+            this.xAnterior = xToque;
 
-            let rotation = this.el.getAttribute('rotation');
-            rotation.y += deltaX * 0.5;
-            this.el.setAttribute('rotation', rotation);
+            let rot = this.el.getAttribute('rotation');
+            rot.y += diffX * 0.5;
+            this.el.setAttribute('rotation', rot);
             
-        } else if (evt.touches.length === 2) {
-            // ESCALADO / PINCH (2 dedos)
-            let currentDistance = this.getDistance(evt.touches);
-            let factor = currentDistance / this.initialDistance;
-            let newScale = this.initialScale * factor;
+        } else if (e.touches.length === 2) {
+            // zoom / escala (2 dedos)
+            let dActual = this.getDist(e.touches);
+            let f = dActual / this.distanciaInicial;
+            let sFinal = this.escalaInicial * f;
             
-            // Limitamos un poco la escala para que no desaparezca ni sea infinito
-            newScale = Math.min(Math.max(newScale, 0.00001), 2);
-            this.el.setAttribute('scale', {x: newScale, y: newScale, z: newScale});
+            // limites para q no se rompa
+            sFinal = Math.min(Math.max(sFinal, 0.00001), 2);
+            this.el.setAttribute('scale', {x: sFinal, y: sFinal, z: sFinal});
         }
     }
 });
 
+// manejamos el hit test para el suelo
 AFRAME.registerComponent('hit-test-handler', {
     init: function () {
-        let ctx = this;
+        let self = this;
         this.hitSource = null;
         this.localSpace = null;
-        this.modeloPuesto = false;
-        this.modeloActual = null;
+        this.yaPuesto = false;
+        this.objModelo = null;
 
-        let txtInfo = document.getElementById('instruction');
-        let txtCargando = document.getElementById('loading-text');
+        let info = document.getElementById('instruction');
+        let loading = document.getElementById('loading-text');
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
             let sess = this.el.sceneEl.renderer.xr.getSession();
-            txtCargando.style.display = 'none';
+            loading.style.display = 'none';
 
-            sess.requestReferenceSpace('viewer').then((space) => {
-                sess.requestHitTestSource({ space: space }).then((source) => {
-                    ctx.hitSource = source;
+            sess.requestReferenceSpace('viewer').then((sp) => {
+                sess.requestHitTestSource({ space: sp }).then((src) => {
+                    self.hitSource = src;
                 });
             });
 
-            sess.requestReferenceSpace('local-floor').then((space) => {
-                ctx.localSpace = space;
+            // intentamos pillar el suelo
+            sess.requestReferenceSpace('local-floor').then((sp) => {
+                self.localSpace = sp;
             }).catch(() => {
-                sess.requestReferenceSpace('local').then((space) => {
-                    ctx.localSpace = space;
+                sess.requestReferenceSpace('local').then((sp) => {
+                    self.localSpace = sp;
                 });
             });
 
-            sess.addEventListener('select', (evt) => {
-                // Solo ponemos el modelo si NO hay ya uno puesto
-                if (ctx.el.getAttribute('visible') && !ctx.modeloPuesto) {
-                    let modelObj = document.createElement('a-entity');
-                    modelObj.setAttribute('gltf-model', archivoGltf);
-                    modelObj.setAttribute('position', ctx.el.getAttribute('position'));
+            sess.addEventListener('select', () => {
+                if (self.el.getAttribute('visible') && !self.yaPuesto) {
+                    let m = document.createElement('a-entity');
+                    m.setAttribute('gltf-model', modeloUrl);
+                    m.setAttribute('position', self.el.getAttribute('position'));
                     
-                    // Convertimos la string de escala del botón a objeto de A-Frame
-                    let s = escalaModelo.split(' ');
-                    modelObj.setAttribute('scale', {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])});
+                    let s = escalaActual.split(' ');
+                    m.setAttribute('scale', {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])});
                     
-                    modelObj.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
-                    modelObj.setAttribute('gesture-handler', '');
+                    m.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
+                    m.setAttribute('gestos', ''); // metemos lo de girar y zoom
 
-                    ctx.el.sceneEl.appendChild(modelObj);
-                    ctx.modeloActual = modelObj;
-                    ctx.modeloPuesto = true;
+                    self.el.sceneEl.appendChild(m);
+                    self.objModelo = m;
+                    self.yaPuesto = true;
 
-                    ctx.el.setAttribute('visible', 'false');
-                    txtInfo.innerText = "¡Colocado! Usa 1 dedo para rotar y 2 para escala";
+                    self.el.setAttribute('visible', 'false');
+                    info.innerText = "¡Listo! Gira con 1 dedo o haz zoom con 2";
 
-                    setTimeout(() => { txtInfo.style.display = 'none'; }, 4000);
+                    setTimeout(() => { info.style.display = 'none'; }, 4000);
                 }
             });
         });
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionend', () => {
-            ctx.hitSource = null;
-            txtInfo.style.display = 'none';
-            txtCargando.style.display = 'none';
+            self.hitSource = null;
+            info.style.display = 'none';
+            loading.style.display = 'none';
             document.getElementById('ar-button').style.display = 'block';
-            ctx.modeloPuesto = false;
-            ctx.modeloActual = null;
+            self.yaPuesto = false;
+            self.objModelo = null;
         });
     },
 
     tick: function () {
-        if (this.modeloPuesto) return;
-        let txtInfo = document.getElementById('instruction');
+        if (this.yaPuesto) return;
+        let info = document.getElementById('instruction');
 
         if (this.el.sceneEl.is('ar-mode')) {
             if (!this.hitSource || !this.localSpace) return;
-            let currentFrame = this.el.sceneEl.frame;
-            if (!currentFrame) return;
+            let frame = this.el.sceneEl.frame;
+            if (!frame) return;
 
-            let hits = currentFrame.getHitTestResults(this.hitSource);
+            let hits = frame.getHitTestResults(this.hitSource);
             if (hits.length > 0) {
                 let pose = hits[0].getPose(this.localSpace);
                 this.el.setAttribute('visible', 'true');
                 this.el.setAttribute('position', pose.transform.position);
-                txtInfo.innerText = "Toca para poner el modelo";
+                info.innerText = "Toca para plantar el modelo";
             } else {
                 this.el.setAttribute('visible', 'false');
-                txtInfo.innerText = "Buscando superficie plana...";
+                info.innerText = "Buscando suelo...";
             }
         }
     }
 });
 
+// al cargar la pagina
 window.onload = () => {
-    let btnMain = document.getElementById('ar-button');
-    let linkIos = document.getElementById('enlace-ios');
-    let txtInfo = document.getElementById('instruction');
-    let txtCargando = document.getElementById('loading-text');
-    let mainScene = document.querySelector('a-scene');
-    let selectionMenu = document.getElementById('selection-menu');
-    let optionButtons = document.querySelectorAll('.option-button');
+    let btnVer = document.getElementById('ar-button');
+    let iosLink = document.getElementById('enlace-ios');
+    let info = document.getElementById('instruction');
+    let loading = document.getElementById('loading-text');
+    let escena = document.querySelector('a-scene');
+    let menu = document.getElementById('selection-menu');
+    let botones = document.querySelectorAll('.option-button');
 
-    optionButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            archivoGltf = btn.getAttribute('data-glb');
-            linkIos.href = btn.getAttribute('data-usdz');
-            escalaModelo = btn.getAttribute('data-scale') || '1 1 1';
+    botones.forEach(b => {
+        b.addEventListener('click', () => {
+            modeloUrl = b.getAttribute('data-glb');
+            iosLink.href = b.getAttribute('data-usdz');
+            escalaActual = b.getAttribute('data-scale') || '1 1 1';
 
-            optionButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            btnMain.style.display = 'block';
+            botones.forEach(btn => btn.classList.remove('active'));
+            b.classList.add('active');
+            btnVer.style.display = 'block';
         });
     });
 
-    btnMain.addEventListener('click', () => {
-        if (checkIOS()) {
-            linkIos.click();
+    btnVer.addEventListener('click', () => {
+        if (esApple()) {
+            iosLink.click();
         } else {
-            if (mainScene.hasLoaded) {
-                mainScene.enterVR(true);
-                btnMain.style.display = 'none';
-                selectionMenu.style.display = 'none';
-                txtInfo.style.display = 'block';
-                txtCargando.style.display = 'block';
+            if (escena.hasLoaded) {
+                escena.enterVR(true);
+                btnVer.style.display = 'none';
+                menu.style.display = 'none';
+                info.style.display = 'block';
+                loading.style.display = 'block';
             }
         }
     });
 
-    mainScene.addEventListener('exit-vr', function () {
-        txtInfo.style.display = 'none';
-        txtCargando.style.display = 'none';
-        btnMain.style.display = 'block';
-        selectionMenu.style.display = 'block';
+    escena.addEventListener('exit-vr', () => {
+        info.style.display = 'none';
+        loading.style.display = 'none';
+        btnVer.style.display = 'block';
+        menu.style.display = 'block';
     });
 };
