@@ -20,29 +20,22 @@
         <div id="selection-menu" class="menu-container">
             <h3>Elige tu modelo:</h3>
             <div class="options-grid">
-                <button class="option-button" id="btn-alanis"
-                    data-glb="./assets/GLB/CastilloAlanisBAKE.glb"
-                    data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz"
-                    data-scale="0.0005 0.0005 0.0005">Castillo Alanís</button>
-                <button class="option-button" id="btn-constantina"
-                    data-glb="./assets/GLB/CastilloConstantinaBAKE.glb"
-                    data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz"
-                    data-scale="0.0005 0.0005 0.0005">Castillo Constantina</button>
-                <button class="option-button" id="btn-victoria"
-                    data-glb="./assets/GLB/TorreVictoriaBAKE.glb"
-                    data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz"
-                    data-scale="0.0005 0.0005 0.0005">Torre Victoria</button>
-                <button class="option-button" id="btn-equipacion"
-                    data-glb="./assets/GLB/Equipacion.glb"
-                    data-usdz="./assets/USDZ/Equipacion.usdz"
-                    data-scale="0.0005 0.0005 0.0005">Equipación</button>
+                <button class="option-button" id="btn-alanis" data-glb="./assets/GLB/CastilloAlanisBAKE.glb"
+                    data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz" data-scale="0.002 0.002 0.002">Castillo
+                    Alanís</button>
+                <button class="option-button" id="btn-constantina" data-glb="./assets/GLB/CastilloConstantinaBAKE.glb"
+                    data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz" data-scale="0.002 0.002 0.002">Castillo
+                    Constantina</button>
+                <button class="option-button" id="btn-victoria" data-glb="./assets/GLB/TorreVictoriaBAKE.glb"
+                    data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz" data-scale="0.002 0.002 0.002">Torre
+                    Victoria</button>
+                <button class="option-button" id="btn-equipacion" data-glb="./assets/GLB/Equipacion.glb"
+                    data-usdz="./assets/USDZ/Equipacion.usdz" data-scale="0.002 0.002 0.002">Equipación</button>
             </div>
 
             <div class="test-container">
-                <button class="option-button btn-test" id="btn-animado"
-                    data-glb="./assets/GLB/Fox.glb"
-                    data-usdz="./assets/USDZ/toy_drummer.usdz"
-                    data-scale="0.02 0.02 0.02">Prueba Animación</button>
+                <button class="option-button btn-test" id="btn-animado" data-glb="./assets/GLB/Fox.glb"
+                    data-usdz="./assets/USDZ/toy_drummer.usdz" data-scale="0.02 0.02 0.02">Prueba Animación</button>
             </div>
         </div>
 
@@ -68,9 +61,9 @@
     <script src="./src/js/app.js"></script>
 
     <!-- configuramos webxr para q pida el hit-test y superponga el div de los botones, además traducimos la ventana de permisos al español -->
-    <a-scene webxr="requiredFeatures: hit-test; optionalFeatures: local, local-floor, dom-overlay; overlayElement: #ui-container"
-        xr-mode-ui="enabled: false"
-        background="color: transparent; transparent: true"
+    <a-scene
+        webxr="requiredFeatures: hit-test; optionalFeatures: local, local-floor, dom-overlay; overlayElement: #ui-container"
+        xr-mode-ui="enabled: false" background="color: transparent; transparent: true"
         renderer="colorManagement: true; antialias: true;"
         device-orientation-permission-ui="allowButtonText: Permitir; denyButtonText: Denegar; cancelButtonText: Cancelar; deviceMotionMessage: Esta experiencia necesita acceder a los sensores de movimiento para colocar objetos en tu entorno.">
 
