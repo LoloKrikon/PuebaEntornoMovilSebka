@@ -104,10 +104,8 @@
         <a-light type="directional" position="-1 4 1" intensity="1.2" cast-shadow="true" 
             shadow-camera-left="-5" shadow-camera-bottom="-5" shadow-camera-right="5" shadow-camera-top="5"></a-light>
 
-        <!-- el circulito donde se va a colocar el modelo -->
-        <a-entity hit-test-handler visible="false">
-            <a-ring color="#00ffff" radius-inner="0.1" radius-outer="0.15" rotation="-90 0 0" opacity="0.8"></a-ring>
-        </a-entity>
+        <!-- el lugar donde se va a colocar el modelo (ahora sin anillo) -->
+        <a-entity id="reticle" hit-test-handler visible="false"></a-entity>
 
     </a-scene>
 </body>

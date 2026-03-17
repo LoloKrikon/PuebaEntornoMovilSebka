@@ -24,6 +24,23 @@ AFRAME.registerShader('shadow-material', {
     }
 });
 
+// modelo transparente (fantasma) para android
+AFRAME.registerComponent('copia-fantasma', {
+    init: function () {
+        this.el.addEventListener('model-loaded', () => {
+            let obj = this.el.getObject3D('mesh');
+            if (obj) {
+                obj.traverse(node => {
+                    if (node.isMesh) {
+                        node.material.transparent = true;
+                        node.material.opacity = 0.5;
+                    }
+                });
+            }
+        });
+    }
+});
+
 // mover y girar con los dedos (Android)
 AFRAME.registerComponent('gestos', {
     init: function () {
@@ -76,6 +93,7 @@ AFRAME.registerComponent('hit-test-handler', {
         this.yaPuesto = false;
         this.objModelo = null;
         this.planoSombra = null;
+        this.preview = null;
 
         let info = document.getElementById('instruction');
         let loading = document.getElementById('loading-text');
@@ -139,15 +157,33 @@ AFRAME.registerComponent('hit-test-handler', {
             self.hitSource = null;
             if (self.planoSombra) self.el.sceneEl.removeChild(self.planoSombra);
             if (self.objModelo) self.el.sceneEl.removeChild(self.objModelo);
+            if (self.preview) self.el.removeChild(self.preview);
+            self.preview = null;
             document.getElementById('ar-button').style.display = 'block';
             self.yaPuesto = false;
         });
+    },
+
+    updatePreview: function() {
+        if (this.preview) {
+            this.el.removeChild(this.preview);
+        }
+        let p = document.createElement('a-entity');
+        p.setAttribute('gltf-model', modeloUrl);
+        
+        let s = escalaActual.split(' ');
+        p.setAttribute('scale', {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])});
+        
+        p.setAttribute('copia-fantasma', '');
+        this.el.appendChild(p);
+        this.preview = p;
     },
 
     tick: function () {
         if (this.yaPuesto) return;
         let info = document.getElementById('instruction');
         if (this.el.sceneEl.is('ar-mode')) {
+            if (!this.preview) this.updatePreview();
             if (!this.hitSource || !this.localSpace) return;
             let frame = this.el.sceneEl.frame;
             if (!frame) return;
