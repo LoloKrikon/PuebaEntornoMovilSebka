@@ -110,6 +110,9 @@ AFRAME.registerComponent('hit-test-handler', {
                     m.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
                     m.setAttribute('gestos', '');
                     m.setAttribute('shadow', 'cast: true; receive: false');
+                    
+                    // brilla un poco más
+                    m.setAttribute('material', 'roughness: 0.5; metalness: 0.5');
 
                     let p = document.createElement('a-plane');
                     p.setAttribute('rotation', '-90 0 0');
@@ -168,12 +171,24 @@ window.onload = () => {
     let btnInfo = document.getElementById('info-button');
     let cardInfo = document.getElementById('info-card');
     let btnCerrarInfo = document.getElementById('close-info');
+    let tutorial = document.getElementById('tutorial');
+    let btnCerrarTutorial = document.getElementById('close-tutorial');
     let iosLink = document.getElementById('enlace-ios');
     let info = document.getElementById('instruction');
     let loading = document.getElementById('loading-text');
     let escena = document.querySelector('a-scene');
     let menu = document.getElementById('selection-menu');
     let botones = document.querySelectorAll('.option-button');
+
+    // mostrar tutorial solo la primera vez o si quiere refrescar
+    if (!localStorage.getItem('tutorialVisto')) {
+        tutorial.style.display = 'block';
+    }
+
+    btnCerrarTutorial.addEventListener('click', () => {
+        tutorial.style.display = 'none';
+        localStorage.setItem('tutorialVisto', 'true');
+    });
 
     botones.forEach(b => {
         b.addEventListener('click', () => {

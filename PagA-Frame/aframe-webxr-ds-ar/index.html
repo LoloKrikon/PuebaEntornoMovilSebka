@@ -16,23 +16,40 @@
 
 
 <body>
+    <audio id="sonido-ar" src="https://www.soundjay.com/nature/wind-01.mp3" loop prefetch></audio>
+    
+    <!-- Tutorial visual -->
+    <div id="tutorial" class="tutorial-container" style="display: none;">
+        <h3 style="color: #111; margin-bottom: 25px;">¿Cómo funciona?</h3>
+        <div class="tutorial-step">
+            <div class="step-icon">1</div>
+            <div class="step-text">Elige un modelo y pulsa "Ver en AR".</div>
+        </div>
+        <div class="tutorial-step">
+            <div class="step-icon">2</div>
+            <div class="step-text">Mueve el móvil despacio para encontrar el suelo.</div>
+        </div>
+        <div class="tutorial-step">
+            <div class="step-icon">3</div>
+            <div class="step-text">Cuando veas el círculo azul, toca para plantar el castillo.</div>
+        </div>
+        <button id="close-tutorial">EMPEZAR</button>
+    </div>
+
     <div id="ui-container">
         <!-- menú de selección -->
         <div id="selection-menu" class="menu-container">
-            <h3>Elige tu modelo:</h3>
+            <h3>Visor de Monumentos</h3>
             <div class="options-grid">
                 <button class="option-button" id="btn-alanis" data-glb="./assets/GLB/CastilloAlanisBAKE.glb"
                     data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz" data-scale="0.05 0.05 0.05"
-                    data-info="Fortificación mudéjar del siglo XIV. Situada sobre un cerro, fue clave en la defensa de la Sierra Norte de Sevilla.">Castillo
-                    Alanís</button>
+                    data-info="Fortificación mudéjar del siglo XIV. Situada sobre un cerro, fue clave en la defensa de la Sierra Norte de Sevilla.">Alanís</button>
                 <button class="option-button" id="btn-constantina" data-glb="./assets/GLB/CastilloConstantinaBAKE.glb"
                     data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz" data-scale="0.05 0.05 0.05"
-                    data-info="Fortaleza de origen árabe construida sobre restos romanos. Su torre del homenaje vigila toda la localidad.">Castillo
-                    Constantina</button>
+                    data-info="Fortaleza de origen árabe construida sobre restos romanos. Su torre del homenaje vigila toda la localidad.">Constantina</button>
                 <button class="option-button" id="btn-victoria" data-glb="./assets/GLB/TorreVictoriaBAKE.glb"
                     data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz" data-scale="0.05 0.05 0.05"
-                    data-info="Antigua torre del convento de la Victoria en Estepa. Destaca por su estilo barroco y sus impresionantes vistas.">Torre
-                    Victoria</button>
+                    data-info="Antigua torre del convento de la Victoria en Estepa. Destaca por su estilo barroco y sus impresionantes vistas.">T. Victoria</button>
                 <button class="option-button" id="btn-equipacion" data-glb="./assets/GLB/Equipacion.glb"
                     data-usdz="./assets/USDZ/Equipacion.usdz" data-scale="0.05 0.05 0.05"
                     data-info="Modelo 3D detallado de la equipación deportiva. Visualiza cada detalle y textura en realidad aumentada.">Equipación</button>
@@ -41,8 +58,7 @@
             <div class="test-container">
                 <button class="option-button btn-test" id="btn-animado" data-glb="./assets/GLB/Fox.glb"
                     data-usdz="./assets/USDZ/toy_drummer.usdz" data-scale="0.02 0.02 0.02"
-                    data-info="Zorro animado para pruebas de WebXR. Permite verificar las animaciones y el refresco de la escena.">Prueba
-                    Animación</button>
+                    data-info="Zorro animado para pruebas de WebXR. Permite verificar las animaciones y el refresco de la escena.">Prueba Visual</button>
             </div>
         </div>
 
@@ -83,10 +99,10 @@
 
         <a-camera position="0 1.6 0"></a-camera>
 
-        <!-- un poco de luz simple -->
-        <a-light type="ambient" intensity="0.6"></a-light>
-        <a-light type="directional" position="-1 4 1" intensity="0.8"
-            shadow="cast: true; shadowCameraLeft: -5; shadowCameraBottom: -5; shadowCameraRight: 5; shadowCameraTop: 5; shadowMapHeight: 1024; shadowMapWidth: 1024;"></a-light>
+        <!-- Iluminación unificada -->
+        <a-light type="ambient" intensity="0.7"></a-light>
+        <a-light type="directional" position="-1 4 1" intensity="1.2" cast-shadow="true" 
+            shadow-camera-left="-5" shadow-camera-bottom="-5" shadow-camera-right="5" shadow-camera-top="5"></a-light>
 
         <!-- el circulito donde se va a colocar el modelo -->
         <a-entity hit-test-handler visible="false">
