@@ -1,0 +1,12 @@
+# Archivos de sistema de Windows
+desktop.ini
+Thumbs.db
+
+# Temporales de Google Drive
+.gdrive
+.tmp.drivedownload
+
+# Carpetas de desarrollo (opcional pero recomendado)
+node_modules/
+dist/
+.DS_Store
