@@ -127,7 +127,7 @@ html {
     border-radius: 12px;
     width: 85%;
     max-width: 400px;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .menu-container h3 {
@@ -171,7 +171,7 @@ html {
     display: flex;
     justify-content: center;
     margin-top: 12px;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 12px;
 }
 
@@ -193,7 +193,7 @@ html {
     max-width: 300px;
     z-index: 1000;
     pointer-events: auto;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     text-align: center;
     border: 1px solid #ddd;
 }
