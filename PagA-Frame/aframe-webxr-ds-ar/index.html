@@ -9,12 +9,16 @@
     <!-- importamos aframe y extras para animaciones -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
 
     <!-- importamos los estilos externos -->
     <link rel="stylesheet" href="./src/css/style.css">
 </head>
 
+
 <body>
+    <!-- sonido de viento/naturaleza suave -->
+    <audio id="sonido-ar" src="https://www.soundjay.com/nature/wind-01.mp3" loop prefetch></audio>
     <div id="ui-container">
         <!-- menú de selección -->
         <div id="selection-menu" class="menu-container">
@@ -40,7 +44,8 @@
             <div class="test-container">
                 <button class="option-button btn-test" id="btn-animado" data-glb="./assets/GLB/Fox.glb"
                     data-usdz="./assets/USDZ/toy_drummer.usdz" data-scale="0.02 0.02 0.02"
-                    data-info="Zorro animado para pruebas de WebXR. Permite verificar las animaciones y el refresco de la escena.">Prueba Animación</button>
+                    data-info="Zorro animado para pruebas de WebXR. Permite verificar las animaciones y el refresco de la escena.">Prueba
+                    Animación</button>
             </div>
         </div>
 
@@ -73,17 +78,20 @@
     <script src="./src/js/app.js"></script>
 
     <!-- escena principal -->
-    <a-scene
+    <a-scene shadow="type: pcfsoft"
         webxr="requiredFeatures: hit-test; optionalFeatures: local, local-floor, dom-overlay; overlayElement: #ui-container"
         xr-mode-ui="enabled: false" background="color: transparent; transparent: true"
         renderer="colorManagement: true; antialias: true;"
         device-orientation-permission-ui="allowButtonText: Permitir; denyButtonText: Denegar; cancelButtonText: Cancelar">
 
-        <a-camera position="0 1.6 0"></a-camera>
+        <a-camera position="0 1.6 0">
+            <a-cursor raycaster="objects: .interactuable" visible="false"></a-cursor>
+        </a-camera>
 
         <!-- un poco de luz simple -->
         <a-light type="ambient" intensity="0.6"></a-light>
-        <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
+        <a-light type="directional" position="-1 4 1" intensity="0.8"
+            shadow="cast: true; shadowCameraLeft: -5; shadowCameraBottom: -5; shadowCameraRight: 5; shadowCameraTop: 5; shadowMapHeight: 1024; shadowMapWidth: 1024;"></a-light>
 
         <!-- el circulito donde se va a colocar el modelo -->
         <a-entity hit-test-handler visible="false">
