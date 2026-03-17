@@ -9,7 +9,6 @@
     <!-- importamos aframe y extras para animaciones -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
-    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
 
     <!-- importamos los estilos externos -->
     <link rel="stylesheet" href="./src/css/style.css">
@@ -17,8 +16,6 @@
 
 
 <body>
-    <!-- sonido de viento/naturaleza suave -->
-    <audio id="sonido-ar" src="https://www.soundjay.com/nature/wind-01.mp3" loop prefetch></audio>
     <div id="ui-container">
         <!-- menú de selección -->
         <div id="selection-menu" class="menu-container">
@@ -84,9 +81,7 @@
         renderer="colorManagement: true; antialias: true;"
         device-orientation-permission-ui="allowButtonText: Permitir; denyButtonText: Denegar; cancelButtonText: Cancelar">
 
-        <a-camera position="0 1.6 0">
-            <a-cursor raycaster="objects: .interactuable" visible="false"></a-cursor>
-        </a-camera>
+        <a-camera position="0 1.6 0"></a-camera>
 
         <!-- un poco de luz simple -->
         <a-light type="ambient" intensity="0.6"></a-light>

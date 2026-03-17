@@ -24,49 +24,7 @@ AFRAME.registerShader('shadow-material', {
     }
 });
 
-// componente para los puntos de informacion (hotspots)
-AFRAME.registerComponent('punto-info', {
-    schema: {
-        texto: {type: 'string', default: 'Información'}
-    },
-    init: function () {
-        let el = this.el;
-        let data = this.data;
-        
-        // creamos el circulo flotante
-        el.setAttribute('geometry', {primitive: 'circle', radius: 0.08});
-        el.setAttribute('material', {color: '#007AFF', opacity: 0.8, emissive: '#007AFF', emissiveIntensity: 0.5});
-        el.setAttribute('class', 'interactuable');
-        
-        // animacion de latido
-        el.setAttribute('animation', {
-            property: 'scale',
-            dir: 'alternate',
-            dur: 1000,
-            easing: 'easeInOutSine',
-            loop: true,
-            to: '1.2 1.2 1.2'
-        });
-
-        // icono 'i' dentro del punto
-        let texto = document.createElement('a-text');
-        texto.setAttribute('value', 'i');
-        texto.setAttribute('align', 'center');
-        texto.setAttribute('color', 'white');
-        texto.setAttribute('width', '2');
-        texto.setAttribute('position', '0 0 0.01');
-        el.appendChild(texto);
-
-        // al hacer click o tocar
-        el.addEventListener('click', () => {
-            document.getElementById('info-title').innerText = "Punto de Interés";
-            document.getElementById('info-text').innerText = data.texto;
-            document.getElementById('info-card').style.display = 'block';
-        });
-    }
-});
-
-// mover y girar con los dedos
+// mover y girar con los dedos (Android)
 AFRAME.registerComponent('gestos', {
     init: function () {
         this.moverDedo = this.moverDedo.bind(this);
@@ -118,18 +76,13 @@ AFRAME.registerComponent('hit-test-handler', {
         this.yaPuesto = false;
         this.objModelo = null;
         this.planoSombra = null;
-        this.puntos = [];
 
         let info = document.getElementById('instruction');
         let loading = document.getElementById('loading-text');
-        let audio = document.getElementById('sonido-ar');
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
             let sess = this.el.sceneEl.renderer.xr.getSession();
             loading.style.display = 'none';
-            
-            // play sonido ambiente
-            audio.play().catch(() => console.log("esperando toque para audio"));
 
             sess.requestReferenceSpace('viewer').then((sp) => {
                 sess.requestHitTestSource({ space: sp }).then((src) => {
@@ -151,19 +104,8 @@ AFRAME.registerComponent('hit-test-handler', {
                     m.setAttribute('gltf-model', modeloUrl);
                     m.setAttribute('position', self.el.getAttribute('position'));
                     
-                    // escala inicial en 0 para animacion de entrada
-                    m.setAttribute('scale', '0 0 0');
-                    
                     let s = escalaActual.split(' ');
-                    let fScale = {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])};
-
-                    // animacion de crecimiento
-                    m.setAttribute('animation', {
-                        property: 'scale',
-                        to: fScale.x + ' ' + fScale.y + ' ' + fScale.z,
-                        dur: 1000,
-                        easing: 'easeOutElastic'
-                    });
+                    m.setAttribute('scale', {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])});
                     
                     m.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
                     m.setAttribute('gestos', '');
@@ -183,9 +125,6 @@ AFRAME.registerComponent('hit-test-handler', {
                     self.planoSombra = p;
                     self.yaPuesto = true;
 
-                    // añadir hotspots de ejemplo
-                    this.ponerPuntos(self.el.getAttribute('position'));
-
                     self.el.setAttribute('visible', 'false');
                     info.innerText = "¡Listo! Gira con 1 dedo o haz zoom con 2";
                     setTimeout(() => { info.style.display = 'none'; }, 4000);
@@ -195,30 +134,10 @@ AFRAME.registerComponent('hit-test-handler', {
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionend', () => {
             self.hitSource = null;
-            audio.pause();
-            audio.currentTime = 0;
             if (self.planoSombra) self.el.sceneEl.removeChild(self.planoSombra);
             if (self.objModelo) self.el.sceneEl.removeChild(self.objModelo);
-            self.puntos.forEach(pt => self.el.sceneEl.removeChild(pt));
-            self.puntos = [];
             document.getElementById('ar-button').style.display = 'block';
             self.yaPuesto = false;
-        });
-    },
-
-    ponerPuntos: function(pos) {
-        let puntosData = [
-            {pos: {x: pos.x + 0.3, y: pos.y + 0.5, z: pos.z}, txt: "Esta torre servía como punto de vigilancia principal."},
-            {pos: {x: pos.x - 0.2, y: pos.y + 0.3, z: pos.z + 0.2}, txt: "La entrada principal fue reconstruida en el siglo XV."}
-        ];
-
-        puntosData.forEach(d => {
-            let pt = document.createElement('a-entity');
-            pt.setAttribute('punto-info', {texto: d.txt});
-            pt.setAttribute('position', d.pos);
-            pt.setAttribute('look-at', '[camera]'); // para que miren siempre al usuario
-            this.el.sceneEl.appendChild(pt);
-            this.puntos.push(pt);
         });
     },
 
