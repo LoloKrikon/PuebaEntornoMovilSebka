@@ -41,7 +41,7 @@ AFRAME.registerComponent('copia-fantasma', {
     }
 });
 
-// mover y girar con los dedos (Android)
+// mover y girar con los dedos (en Android)
 AFRAME.registerComponent('gestos', {
     init: function () {
         this.moverDedo = this.moverDedo.bind(this);
@@ -52,7 +52,7 @@ AFRAME.registerComponent('gestos', {
         window.addEventListener('touchstart', this.inicioToque);
         window.addEventListener('touchmove', this.moverDedo);
     },
-    inicioToque: function(e) {
+    inicioToque: function (e) {
         if (e.touches.length === 1) {
             this.xAnterior = e.touches[0].pageX;
         } else if (e.touches.length === 2) {
@@ -60,7 +60,7 @@ AFRAME.registerComponent('gestos', {
             this.escalaInicial = this.el.getAttribute('scale').x;
         }
     },
-    getDist: function(t) {
+    getDist: function (t) {
         let dx = t[0].pageX - t[1].pageX;
         let dy = t[0].pageY - t[1].pageY;
         return Math.sqrt(dx * dx + dy * dy);
@@ -79,7 +79,7 @@ AFRAME.registerComponent('gestos', {
             let f = dActual / this.distanciaInicial;
             let sFinal = this.escalaInicial * f;
             sFinal = Math.min(Math.max(sFinal, 0.00001), 2);
-            this.el.setAttribute('scale', {x: sFinal, y: sFinal, z: sFinal});
+            this.el.setAttribute('scale', { x: sFinal, y: sFinal, z: sFinal });
         }
     }
 });
@@ -121,14 +121,14 @@ AFRAME.registerComponent('hit-test-handler', {
                     let m = document.createElement('a-entity');
                     m.setAttribute('gltf-model', modeloUrl);
                     m.setAttribute('position', self.el.getAttribute('position'));
-                    
+
                     let s = escalaActual.split(' ');
-                    m.setAttribute('scale', {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])});
-                    
+                    m.setAttribute('scale', { x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2]) });
+
                     m.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
                     m.setAttribute('gestos', '');
                     m.setAttribute('shadow', 'cast: true; receive: false');
-                    
+
                     // brilla un poco más
                     m.setAttribute('material', 'roughness: 0.5; metalness: 0.5');
 
@@ -164,16 +164,16 @@ AFRAME.registerComponent('hit-test-handler', {
         });
     },
 
-    updatePreview: function() {
+    updatePreview: function () {
         if (this.preview) {
             this.el.removeChild(this.preview);
         }
         let p = document.createElement('a-entity');
         p.setAttribute('gltf-model', modeloUrl);
-        
+
         let s = escalaActual.split(' ');
-        p.setAttribute('scale', {x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2])});
-        
+        p.setAttribute('scale', { x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2]) });
+
         p.setAttribute('copia-fantasma', '');
         this.el.appendChild(p);
         this.preview = p;
