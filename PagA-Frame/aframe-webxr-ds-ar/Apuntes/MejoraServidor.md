@@ -1,6 +1,7 @@
-# Mejoras para la Web: Arquitectura de Servidor y Carga Dinámica
 
-Actualmente, todos los modelos 3D (.glb y .usdz) están guardados dentro de la propia carpeta del proyecto. Esto funciona bien para unos pocos archivos, pero si quieres tener 50 castillos o muchos objetos, la web se volvería muy pesada y lenta de cargar.
+# Mejoras para la Web: Arquitectura de Servidor y Carga Dinámica
+Actualmente, todos los modelos 3D (.glb y .usdz) están guardados dentro de la propia carpeta del proyecto. 
+Esto funciona bien para unos pocos archivos, pero si quieres tener 50 castillos o muchos objetos, la web se volvería muy pesada y lenta de cargar.
 
 Aquí te explico cómo se podría mejorar usando un servidor externo y peticiones dinámicas.
 

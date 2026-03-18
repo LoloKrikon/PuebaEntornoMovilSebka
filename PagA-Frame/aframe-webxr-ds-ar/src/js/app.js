@@ -237,12 +237,14 @@ window.onload = () => {
             b.classList.add('active');
             btnVer.style.display = 'block';
             btnInfo.style.display = 'flex';
+
+            // Actualizar el contenido de la ficha informativa inmediatamente
+            document.getElementById('info-title').innerText = nombreActual;
+            document.getElementById('info-text').innerText = infoActual;
         });
     });
 
     btnInfo.addEventListener('click', () => {
-        document.getElementById('info-title').innerText = nombreActual;
-        document.getElementById('info-text').innerText = infoActual;
         cardInfo.style.display = 'block';
     });
 
