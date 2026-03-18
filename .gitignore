@@ -6,7 +6,7 @@ Thumbs.db
 .gdrive
 .tmp.drivedownload
 
-# Carpetas de desarrollo (opcional pero recomendado)
+# Carpetas de desarrollo
 node_modules/
 dist/
 .DS_Store
