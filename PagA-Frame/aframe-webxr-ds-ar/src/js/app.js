@@ -1,277 +1,98 @@
-let modeloUrl = "";
-let escalaActual = "1 1 1";
+import { Utils } from './utils.js';
+import { ARState } from './components.js'; // Solo para actualizar el estado
+import { MonumentData, generateButtons } from './monuments.js';
+
+// Variables para seguimiento del modelo seleccionado actualmente
 let nombreActual = "";
 let infoActual = "";
 
-// para saber si es iphone o no
-function esApple() {
-    return [
-        'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'
-    ].includes(navigator.platform)
-        || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-        || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
-}
-
-// material para sombras reales
-AFRAME.registerShader('shadow-material', {
-    schema: { opacity: { type: 'number', default: 0.4 } },
-    init: function (data) {
-        this.material = new THREE.ShadowMaterial();
-        this.material.opacity = data.opacity;
-    },
-    update: function (data) {
-        this.material.opacity = data.opacity;
-    }
-});
-
-// modelo transparente (fantasma) para android
-AFRAME.registerComponent('copia-fantasma', {
-    init: function () {
-        this.el.addEventListener('model-loaded', () => {
-            let obj = this.el.getObject3D('mesh');
-            if (obj) {
-                obj.traverse(node => {
-                    if (node.isMesh) {
-                        node.material.transparent = true;
-                        node.material.opacity = 0.5;
-                    }
-                });
-            }
-        });
-    }
-});
-
-// mover y girar con los dedos (en Android)
-AFRAME.registerComponent('gestos', {
-    init: function () {
-        this.moverDedo = this.moverDedo.bind(this);
-        this.inicioToque = this.inicioToque.bind(this);
-        this.xAnterior = 0;
-        this.distanciaInicial = 0;
-        this.escalaInicial = 1;
-        window.addEventListener('touchstart', this.inicioToque);
-        window.addEventListener('touchmove', this.moverDedo);
-    },
-    inicioToque: function (e) {
-        if (e.touches.length === 1) {
-            this.xAnterior = e.touches[0].pageX;
-        } else if (e.touches.length === 2) {
-            this.distanciaInicial = this.getDist(e.touches);
-            this.escalaInicial = this.el.getAttribute('scale').x;
-        }
-    },
-    getDist: function (t) {
-        let dx = t[0].pageX - t[1].pageX;
-        let dy = t[0].pageY - t[1].pageY;
-        return Math.sqrt(dx * dx + dy * dy);
-    },
-    moverDedo: function (e) {
-        if (!this.el.sceneEl.is('ar-mode')) return;
-        if (e.touches.length === 1) {
-            let xToque = e.touches[0].pageX;
-            let diffX = xToque - this.xAnterior;
-            this.xAnterior = xToque;
-            let rot = this.el.getAttribute('rotation');
-            rot.y += diffX * 0.5;
-            this.el.setAttribute('rotation', rot);
-        } else if (e.touches.length === 2) {
-            let dActual = this.getDist(e.touches);
-            let f = dActual / this.distanciaInicial;
-            let sFinal = this.escalaInicial * f;
-            sFinal = Math.min(Math.max(sFinal, 0.00001), 2);
-            this.el.setAttribute('scale', { x: sFinal, y: sFinal, z: sFinal });
-        }
-    }
-});
-
-// detector de suelo y colocar modelo
-AFRAME.registerComponent('hit-test-handler', {
-    init: function () {
-        let self = this;
-        this.hitSource = null;
-        this.localSpace = null;
-        this.yaPuesto = false;
-        this.objModelo = null;
-        this.planoSombra = null;
-        this.preview = null;
-
-        let info = document.getElementById('instruction');
-        let loading = document.getElementById('loading-text');
-
-        this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
-            let sess = this.el.sceneEl.renderer.xr.getSession();
-            loading.style.display = 'none';
-
-            sess.requestReferenceSpace('viewer').then((sp) => {
-                sess.requestHitTestSource({ space: sp }).then((src) => {
-                    self.hitSource = src;
-                });
-            });
-
-            sess.requestReferenceSpace('local-floor').then((sp) => {
-                self.localSpace = sp;
-            }).catch(() => {
-                sess.requestReferenceSpace('local').then((sp) => {
-                    self.localSpace = sp;
-                });
-            });
-
-            sess.addEventListener('select', () => {
-                if (self.el.getAttribute('visible') && !self.yaPuesto) {
-                    let m = document.createElement('a-entity');
-                    m.setAttribute('gltf-model', modeloUrl);
-                    m.setAttribute('position', self.el.getAttribute('position'));
-
-                    let s = escalaActual.split(' ');
-                    m.setAttribute('scale', { x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2]) });
-
-                    m.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
-                    m.setAttribute('gestos', '');
-                    m.setAttribute('shadow', 'cast: true; receive: false');
-
-                    // brilla un poco más
-                    m.setAttribute('material', 'roughness: 0.5; metalness: 0.5');
-
-                    let p = document.createElement('a-plane');
-                    p.setAttribute('rotation', '-90 0 0');
-                    p.setAttribute('position', self.el.getAttribute('position'));
-                    p.setAttribute('width', '15');
-                    p.setAttribute('height', '15');
-                    p.setAttribute('material', 'shader: shadow-material; opacity: 0.4');
-                    p.setAttribute('shadow', 'receive: true; cast: false');
-
-                    self.el.sceneEl.appendChild(m);
-                    self.el.sceneEl.appendChild(p);
-                    self.objModelo = m;
-                    self.planoSombra = p;
-                    self.yaPuesto = true;
-
-                    self.el.setAttribute('visible', 'false');
-                    info.innerText = "¡Listo! Gira con 1 dedo o haz zoom con 2";
-                    setTimeout(() => { info.style.display = 'none'; }, 4000);
-                }
-            });
-        });
-
-        this.el.sceneEl.renderer.xr.addEventListener('sessionend', () => {
-            self.hitSource = null;
-            if (self.planoSombra) self.el.sceneEl.removeChild(self.planoSombra);
-            if (self.objModelo) self.el.sceneEl.removeChild(self.objModelo);
-            if (self.preview) self.el.removeChild(self.preview);
-            self.preview = null;
-            document.getElementById('ar-button').style.display = 'block';
-            self.yaPuesto = false;
-        });
-    },
-
-    updatePreview: function () {
-        if (this.preview) {
-            this.el.removeChild(this.preview);
-        }
-        let p = document.createElement('a-entity');
-        p.setAttribute('gltf-model', modeloUrl);
-
-        let s = escalaActual.split(' ');
-        p.setAttribute('scale', { x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2]) });
-
-        p.setAttribute('copia-fantasma', '');
-        this.el.appendChild(p);
-        this.preview = p;
-    },
-
-    tick: function () {
-        if (this.yaPuesto) return;
-        let info = document.getElementById('instruction');
-        if (this.el.sceneEl.is('ar-mode')) {
-            if (!this.preview) this.updatePreview();
-            if (!this.hitSource || !this.localSpace) return;
-            let frame = this.el.sceneEl.frame;
-            if (!frame) return;
-            let hits = frame.getHitTestResults(this.hitSource);
-            if (hits.length > 0) {
-                let pose = hits[0].getPose(this.localSpace);
-                this.el.setAttribute('visible', 'true');
-                this.el.setAttribute('position', pose.transform.position);
-                info.innerText = "Toca para plantar el modelo";
-            } else {
-                this.el.setAttribute('visible', 'false');
-                info.innerText = "Buscando suelo...";
-            }
-        }
-    }
-});
-
-// al cargar la pagina
 window.onload = () => {
-    let btnVer = document.getElementById('ar-button');
-    let btnInfo = document.getElementById('info-button');
-    let cardInfo = document.getElementById('info-card');
-    let btnCerrarInfo = document.getElementById('close-info');
-    let tutorial = document.getElementById('tutorial');
-    let btnCerrarTutorial = document.getElementById('close-tutorial');
-    let iosLink = document.getElementById('enlace-ios');
-    let info = document.getElementById('instruction');
-    let loading = document.getElementById('loading-text');
-    let escena = document.querySelector('a-scene');
-    let menu = document.getElementById('selection-menu');
-    let botones = document.querySelectorAll('.option-button');
+    // Referencias al DOM
+    const elements = {
+        btnVer: document.getElementById('ar-button'),
+        btnInfo: document.getElementById('info-button'),
+        cardInfo: document.getElementById('info-card'),
+        btnCerrarInfo: document.getElementById('close-info'),
+        tutorial: document.getElementById('tutorial'),
+        btnCerrarTutorial: document.getElementById('close-tutorial'),
+        iosLink: document.getElementById('enlace-ios'),
+        info: document.getElementById('instruction'),
+        loading: document.getElementById('loading-text'),
+        escena: document.querySelector('a-scene'),
+        menu: document.getElementById('selection-menu'),
+        optionsGrid: document.querySelector('.options-grid'),
+        testContainer: document.querySelector('.test-container')
+    };
 
-    // mostrar tutorial solo la primera vez o si quiere refrescar
+    // 1. Tutorial logic
     if (!localStorage.getItem('tutorialVisto')) {
-        tutorial.style.display = 'block';
+        elements.tutorial.style.display = 'block';
     }
 
-    btnCerrarTutorial.addEventListener('click', () => {
-        tutorial.style.display = 'none';
+    elements.btnCerrarTutorial.addEventListener('click', () => {
+        elements.tutorial.style.display = 'none';
         localStorage.setItem('tutorialVisto', 'true');
     });
 
-    botones.forEach(b => {
-        b.addEventListener('click', () => {
-            modeloUrl = b.getAttribute('data-glb');
-            iosLink.href = b.getAttribute('data-usdz');
-            escalaActual = b.getAttribute('data-scale') || '1 1 1';
-            nombreActual = b.innerText;
-            infoActual = b.getAttribute('data-info');
-            botones.forEach(btn => btn.classList.remove('active'));
-            b.classList.add('active');
-            btnVer.style.display = 'block';
-            btnInfo.style.display = 'flex';
-
-            // Actualizar el contenido de la ficha informativa inmediatamente
-            document.getElementById('info-title').innerText = nombreActual;
-            document.getElementById('info-text').innerText = infoActual;
-        });
+    // 2. Info card logic
+    elements.btnInfo.addEventListener('click', () => {
+        elements.cardInfo.style.display = 'block';
     });
 
-    btnInfo.addEventListener('click', () => {
-        cardInfo.style.display = 'block';
+    elements.btnCerrarInfo.addEventListener('click', () => {
+        elements.cardInfo.style.display = 'none';
     });
 
-    btnCerrarInfo.addEventListener('click', () => {
-        cardInfo.style.display = 'none';
+    // 3. Generate monument buttons and handle selection
+    // Limpiamos los contenedores por si acaso (aunque ahora los generamos de cero)
+    elements.optionsGrid.innerHTML = '';
+    elements.testContainer.innerHTML = '';
+
+    generateButtons(elements.optionsGrid, elements.testContainer, (monumento, btn) => {
+        // Actualizar estado compartido
+        ARState.modeloUrl = monumento.glb;
+        ARState.escalaActual = monumento.scale || '1 1 1';
+        
+        // Actualizar variables locales para la UI
+        nombreActual = monumento.name;
+        infoActual = monumento.info;
+        elements.iosLink.href = monumento.usdz;
+
+        // Feedback visual en botones
+        document.querySelectorAll('.option-button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Mostrar botones de acción
+        elements.btnVer.style.display = 'block';
+        elements.btnInfo.style.display = 'flex';
+
+        // Actualizar ficha informativa inmediatamente
+        document.getElementById('info-title').innerText = nombreActual;
+        document.getElementById('info-text').innerText = infoActual;
     });
 
-    btnVer.addEventListener('click', () => {
-        if (esApple()) {
-            iosLink.click();
+    // 4. AR Start logic
+    elements.btnVer.addEventListener('click', () => {
+        if (Utils.esApple()) {
+            elements.iosLink.click();
         } else {
-            if (escena.hasLoaded) {
-                escena.enterVR(true);
-                btnVer.style.display = 'none';
-                menu.style.display = 'none';
-                info.style.display = 'block';
-                loading.style.display = 'block';
+            if (elements.escena.hasLoaded) {
+                elements.escena.enterVR(true);
+                elements.btnVer.style.display = 'none';
+                elements.menu.style.display = 'none';
+                elements.info.style.display = 'block';
+                elements.loading.style.display = 'block';
             }
         }
     });
 
-    escena.addEventListener('exit-vr', () => {
-        info.style.display = 'none';
-        loading.style.display = 'none';
-        btnVer.style.display = 'block';
-        menu.style.display = 'block';
-        btnInfo.style.display = 'block';
-        cardInfo.style.display = 'none';
+    // 5. Scene event handling
+    elements.escena.addEventListener('exit-vr', () => {
+        elements.info.style.display = 'none';
+        elements.loading.style.display = 'none';
+        elements.btnVer.style.display = 'block';
+        elements.menu.style.display = 'block';
+        elements.btnInfo.style.display = 'block';
+        elements.cardInfo.style.display = 'none';
     });
 };

@@ -41,24 +41,11 @@
         <div id="selection-menu" class="menu-container">
             <h3>Visor de Monumentos</h3>
             <div class="options-grid">
-                <button class="option-button" id="btn-alanis" data-glb="./assets/GLB/CastilloAlanisBAKE.glb"
-                    data-usdz="./assets/USDZ/CastilloAlanisBAKE.usdz" data-scale="0.05 0.05 0.05"
-                    data-info="Fortificación mudéjar del siglo XIV. Situada sobre un cerro, fue clave en la defensa de la Sierra Norte de Sevilla.">Alanís</button>
-                <button class="option-button" id="btn-constantina" data-glb="./assets/GLB/CastilloConstantinaBAKE.glb"
-                    data-usdz="./assets/USDZ/CastilloConstantinaBAKE.usdz" data-scale="0.05 0.05 0.05"
-                    data-info="Fortaleza de origen árabe construida sobre restos romanos. Su torre del homenaje vigila toda la localidad.">Constantina</button>
-                <button class="option-button" id="btn-victoria" data-glb="./assets/GLB/TorreVictoriaBAKE.glb"
-                    data-usdz="./assets/USDZ/TorreVictoriaBAKE.usdz" data-scale="0.05 0.05 0.05"
-                    data-info="Antigua torre del convento de la Victoria en Estepa. Destaca por su estilo barroco y sus impresionantes vistas.">T. Victoria</button>
-                <button class="option-button" id="btn-equipacion" data-glb="./assets/GLB/Equipacion.glb"
-                    data-usdz="./assets/USDZ/Equipacion.usdz" data-scale="0.05 0.05 0.05"
-                    data-info="Modelo 3D detallado de la equipación deportiva. Visualiza cada detalle y textura en realidad aumentada.">Equipación</button>
+                <!-- Los botones se generan dinámicamente desde monuments.js -->
             </div>
 
             <div class="test-container">
-                <button class="option-button btn-test" id="btn-animado" data-glb="./assets/GLB/Fox.glb"
-                    data-usdz="./assets/USDZ/toy_drummer.usdz" data-scale="0.02 0.02 0.02"
-                    data-info="Zorro animado para pruebas de WebXR. Permite verificar las animaciones y el refresco de la escena.">Prueba 3D animado</button>
+                <!-- Botones de prueba generados dinámicamente -->
             </div>
         </div>
 
@@ -87,8 +74,8 @@
         <img src="" alt="AR">
     </a>
 
-    <!-- importamos nuestro script -->
-    <script src="./src/js/app.js"></script>
+    <!-- importamos nuestro script como módulo -->
+    <script type="module" src="./src/js/app.js"></script>
 
     <!-- escena principal -->
     <a-scene shadow="type: pcfsoft"
