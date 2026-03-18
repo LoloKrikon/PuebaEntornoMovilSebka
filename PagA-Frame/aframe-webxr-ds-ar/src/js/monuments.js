@@ -36,6 +36,22 @@ export const MonumentData = [
         info: 'Modelo 3D detallado de la equipación deportiva. Visualiza cada detalle y textura en realidad aumentada.'
     },
     {
+        id: 'robot-happy',
+        name: 'Robot Feliz',
+        glb: './assets/GLB/Robot_Happy.glb',
+        usdz: './assets/USDZ/Robot_Happy.usdz',
+        scale: '0.02 0.02 0.02',
+        info: 'Diseño de un pequeño robot animado en estado alegre.'
+    },
+    {
+        id: 'robot-headplay',
+        name: 'Robot Jugando',
+        glb: './assets/GLB/Robot_Headplay.glb',
+        usdz: './assets/USDZ/Robot_Headplay.usdz',
+        scale: '0.02 0.02 0.02',
+        info: 'Diseño animado de un robot realizando movimientos con la cabeza.'
+    },
+    {
         id: 'animado',
         name: 'Prueba 3D animado',
         glb: './assets/GLB/Fox.glb',
