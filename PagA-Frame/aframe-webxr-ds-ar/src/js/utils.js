@@ -4,7 +4,7 @@
 
 export const Utils = {
     /**
-     * Detecta si el dispositivo es un producto Apple
+     * Detecta si el dispositivo es Apple
      * @returns {boolean}
      */
     esApple: () => {
