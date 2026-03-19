@@ -33,7 +33,7 @@ export const MonumentData = [
         glb: './assets/GLB/Equipacion.glb',
         usdz: './assets/USDZ/Equipacion.usdz',
         scale: '0.05 0.05 0.05',
-        info: 'Modelo 3D detallado de la equipación deportiva. Visualiza cada detalle y textura en realidad aumentada.'
+        info: 'Ropa de la epoca'
     },
     {
         id: 'animado',
