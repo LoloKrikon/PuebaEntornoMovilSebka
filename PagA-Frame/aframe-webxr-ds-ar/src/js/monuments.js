@@ -1,7 +1,3 @@
-/**
- * Datos y gestión de los monumentos
- */
-
 export const MonumentData = [
     {
         id: 'alanis',
@@ -37,27 +33,27 @@ export const MonumentData = [
     },
     {
         id: 'animado',
-        name: 'Prueba 3D animado',
+        name: 'Pruebas',
         glb: './assets/GLB/Fox.glb',
         usdz: './assets/USDZ/toy_drummer.usdz',
         scale: '0.02 0.02 0.02',
-        info: 'Zorro animado para pruebas de WebXR. Permite verificar las animaciones y el refresco de la escena.',
+        info: 'Usa esta opción para probar que el visor y las animaciones carguen bien.',
         isTest: true
     }
 ];
 
 export function generateButtons(container, testContainer, onSelect) {
-    MonumentData.forEach(monumento => {
+    MonumentData.forEach(monument => {
         const btn = document.createElement('button');
-        btn.className = 'option-button' + (monumento.isTest ? ' btn-test' : '');
-        btn.id = `btn-${monumento.id}`;
-        btn.innerText = monumento.name;
+        btn.className = 'option-button' + (monument.isTest ? ' btn-test' : '');
+        btn.id = `btn-${monument.id}`;
+        btn.innerText = monument.name;
         
         btn.addEventListener('click', () => {
-            onSelect(monumento, btn);
+            onSelect(monument, btn);
         });
 
-        if (monumento.isTest) {
+        if (monument.isTest) {
             testContainer.appendChild(btn);
         } else {
             container.appendChild(btn);

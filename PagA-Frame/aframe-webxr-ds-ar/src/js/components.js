@@ -1,15 +1,9 @@
-/**
- * Registro de componentes y shaders de A-Frame
- */
-
-// Estado compartido (sería mejor pasarlo por atributos, pero para el refactor mantenemos la lógica)
 export const ARState = {
-    modeloUrl: "",
-    escalaActual: "1 1 1",
-    yaPuesto: false
+    modelUrl: "",
+    currentScale: "1 1 1",
+    isPlaced: false
 };
 
-// Material para sombras reales
 AFRAME.registerShader('shadow-material', {
     schema: { opacity: { type: 'number', default: 0.4 } },
     init: function (data) {
@@ -21,13 +15,12 @@ AFRAME.registerShader('shadow-material', {
     }
 });
 
-// Modelo transparente (fantasma)
-AFRAME.registerComponent('copia-fantasma', {
+AFRAME.registerComponent('ghost-model', {
     init: function () {
         this.el.addEventListener('model-loaded', () => {
-            let obj = this.el.getObject3D('mesh');
-            if (obj) {
-                obj.traverse(node => {
+            const mesh = this.el.getObject3D('mesh');
+            if (mesh) {
+                mesh.traverse(node => {
                     if (node.isMesh) {
                         node.material.transparent = true;
                         node.material.opacity = 0.5;
@@ -38,110 +31,120 @@ AFRAME.registerComponent('copia-fantasma', {
     }
 });
 
-// Gestos táctiles
-AFRAME.registerComponent('gestos', {
+AFRAME.registerComponent('ar-controls', {
     init: function () {
-        this.moverDedo = this.moverDedo.bind(this);
-        this.inicioToque = this.inicioToque.bind(this);
-        this.xAnterior = 0;
-        this.distanciaInicial = 0;
-        this.escalaInicial = 1;
-        window.addEventListener('touchstart', this.inicioToque);
-        window.addEventListener('touchmove', this.moverDedo);
+        this.handleTouchMove = this.handleTouchMove.bind(this);
+        this.handleTouchStart = this.handleTouchStart.bind(this);
+        this.prevX = 0;
+        this.initialDist = 0;
+        this.initialScale = 1;
+
+        window.addEventListener('touchstart', this.handleTouchStart);
+        window.addEventListener('touchmove', this.handleTouchMove);
     },
-    inicioToque: function (e) {
+
+    handleTouchStart: function (e) {
         if (e.touches.length === 1) {
-            this.xAnterior = e.touches[0].pageX;
+            this.prevX = e.touches[0].pageX;
         } else if (e.touches.length === 2) {
-            this.distanciaInicial = this.getDist(e.touches);
-            this.escalaInicial = this.el.getAttribute('scale').x;
+            this.initialDist = this.getDistance(e.touches);
+            this.initialScale = this.el.getAttribute('scale').x;
         }
     },
-    getDist: function (t) {
-        let dx = t[0].pageX - t[1].pageX;
-        let dy = t[0].pageY - t[1].pageY;
+
+    getDistance: function (t) {
+        const dx = t[0].pageX - t[1].pageX;
+        const dy = t[0].pageY - t[1].pageY;
         return Math.sqrt(dx * dx + dy * dy);
     },
-    moverDedo: function (e) {
+
+    handleTouchMove: function (e) {
         if (!this.el.sceneEl.is('ar-mode')) return;
+
         if (e.touches.length === 1) {
-            let xToque = e.touches[0].pageX;
-            let diffX = xToque - this.xAnterior;
-            this.xAnterior = xToque;
-            let rot = this.el.getAttribute('rotation');
-            rot.y += diffX * 0.5;
-            this.el.setAttribute('rotation', rot);
+            const touchX = e.touches[0].pageX;
+            const diffX = touchX - this.prevX;
+            this.prevX = touchX;
+
+            const rotation = this.el.getAttribute('rotation');
+            rotation.y += diffX * 0.5;
+            this.el.setAttribute('rotation', rotation);
         } else if (e.touches.length === 2) {
-            let dActual = this.getDist(e.touches);
-            let f = dActual / this.distanciaInicial;
-            let sFinal = this.escalaInicial * f;
-            sFinal = Math.min(Math.max(sFinal, 0.00001), 2);
-            this.el.setAttribute('scale', { x: sFinal, y: sFinal, z: sFinal });
+            const currentDist = this.getDistance(e.touches);
+            const factor = currentDist / this.initialDist;
+            let finalScale = this.initialScale * factor;
+            
+            finalScale = Math.min(Math.max(finalScale, 0.001), 2);
+            this.el.setAttribute('scale', { x: finalScale, y: finalScale, z: finalScale });
         }
     }
 });
 
-// Detector de suelo y colocación
 AFRAME.registerComponent('hit-test-handler', {
     init: function () {
-        let self = this;
+        const self = this;
         this.hitSource = null;
         this.localSpace = null;
-        this.objModelo = null;
-        this.planoSombra = null;
+        this.modelObj = null;
+        this.shadowPlane = null;
         this.preview = null;
 
-        let info = document.getElementById('instruction');
-        let loading = document.getElementById('loading-text');
+        const info = document.getElementById('instruction');
+        const loading = document.getElementById('loading-text');
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionstart', () => {
-            let sess = this.el.sceneEl.renderer.xr.getSession();
+            const session = this.el.sceneEl.renderer.xr.getSession();
             loading.style.display = 'none';
 
-            sess.requestReferenceSpace('viewer').then((sp) => {
-                sess.requestHitTestSource({ space: sp }).then((src) => {
-                    self.hitSource = src;
+            session.requestReferenceSpace('viewer').then((space) => {
+                session.requestHitTestSource({ space: space }).then((source) => {
+                    self.hitSource = source;
                 });
             });
 
-            sess.requestReferenceSpace('local-floor').then((sp) => {
-                self.localSpace = sp;
+            session.requestReferenceSpace('local-floor').then((space) => {
+                self.localSpace = space;
             }).catch(() => {
-                sess.requestReferenceSpace('local').then((sp) => {
-                    self.localSpace = sp;
+                session.requestReferenceSpace('local').then((space) => {
+                    self.localSpace = space;
                 });
             });
 
-            sess.addEventListener('select', () => {
-                if (self.el.getAttribute('visible') && !ARState.yaPuesto) {
-                    let m = document.createElement('a-entity');
-                    m.setAttribute('gltf-model', ARState.modeloUrl);
-                    m.setAttribute('position', self.el.getAttribute('position'));
+            session.addEventListener('select', () => {
+                if (self.el.getAttribute('visible') && !ARState.isPlaced) {
+                    const model = document.createElement('a-entity');
+                    model.setAttribute('gltf-model', ARState.modelUrl);
+                    model.setAttribute('position', self.el.getAttribute('position'));
 
-                    let s = ARState.escalaActual.split(' ');
-                    m.setAttribute('scale', { x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2]) });
+                    const scale = ARState.currentScale.split(' ');
+                    model.setAttribute('scale', { 
+                        x: parseFloat(scale[0]), 
+                        y: parseFloat(scale[1]), 
+                        z: parseFloat(scale[2]) 
+                    });
 
-                    m.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
-                    m.setAttribute('gestos', '');
-                    m.setAttribute('shadow', 'cast: true; receive: false');
-                    m.setAttribute('material', 'roughness: 0.5; metalness: 0.5');
+                    model.setAttribute('animation-mixer', 'loop: repeat; timeScale: 1');
+                    model.setAttribute('ar-controls', '');
+                    model.setAttribute('shadow', 'cast: true; receive: false');
+                    model.setAttribute('material', 'roughness: 0.5; metalness: 0.5');
 
-                    let p = document.createElement('a-plane');
-                    p.setAttribute('rotation', '-90 0 0');
-                    p.setAttribute('position', self.el.getAttribute('position'));
-                    p.setAttribute('width', '15');
-                    p.setAttribute('height', '15');
-                    p.setAttribute('material', 'shader: shadow-material; opacity: 0.4');
-                    p.setAttribute('shadow', 'receive: true; cast: false');
+                    const plane = document.createElement('a-plane');
+                    plane.setAttribute('rotation', '-90 0 0');
+                    plane.setAttribute('position', self.el.getAttribute('position'));
+                    plane.setAttribute('width', '15');
+                    plane.setAttribute('height', '15');
+                    plane.setAttribute('material', 'shader: shadow-material; opacity: 0.4');
+                    plane.setAttribute('shadow', 'receive: true; cast: false');
 
-                    self.el.sceneEl.appendChild(m);
-                    self.el.sceneEl.appendChild(p);
-                    self.objModelo = m;
-                    self.planoSombra = p;
-                    ARState.yaPuesto = true;
+                    self.el.sceneEl.appendChild(model);
+                    self.el.sceneEl.appendChild(plane);
+
+                    self.modelObj = model;
+                    self.shadowPlane = plane;
+                    ARState.isPlaced = true;
 
                     self.el.setAttribute('visible', 'false');
-                    info.innerText = "¡Listo! Gira con 1 dedo o haz zoom con 2";
+                    info.innerText = "Enjoy the view! Rotate with one finger or zoom with two.";
                     setTimeout(() => { info.style.display = 'none'; }, 4000);
                 }
             });
@@ -149,47 +152,54 @@ AFRAME.registerComponent('hit-test-handler', {
 
         this.el.sceneEl.renderer.xr.addEventListener('sessionend', () => {
             self.hitSource = null;
-            if (self.planoSombra) self.el.sceneEl.removeChild(self.planoSombra);
-            if (self.objModelo) self.el.sceneEl.removeChild(self.objModelo);
+            if (self.shadowPlane) self.el.sceneEl.removeChild(self.shadowPlane);
+            if (self.modelObj) self.el.sceneEl.removeChild(self.modelObj);
             if (self.preview) self.el.removeChild(self.preview);
+            
             self.preview = null;
             document.getElementById('ar-button').style.display = 'block';
-            ARState.yaPuesto = false;
+            ARState.isPlaced = false;
         });
     },
 
     updatePreview: function () {
-        if (this.preview) {
-            this.el.removeChild(this.preview);
-        }
-        let p = document.createElement('a-entity');
-        p.setAttribute('gltf-model', ARState.modeloUrl);
+        if (this.preview) this.el.removeChild(this.preview);
 
-        let s = ARState.escalaActual.split(' ');
-        p.setAttribute('scale', { x: parseFloat(s[0]), y: parseFloat(s[1]), z: parseFloat(s[2]) });
+        const preview = document.createElement('a-entity');
+        preview.setAttribute('gltf-model', ARState.modelUrl);
 
-        p.setAttribute('copia-fantasma', '');
-        this.el.appendChild(p);
-        this.preview = p;
+        const scale = ARState.currentScale.split(' ');
+        preview.setAttribute('scale', { 
+            x: parseFloat(scale[0]), 
+            y: parseFloat(scale[1]), 
+            z: parseFloat(scale[2]) 
+        });
+
+        preview.setAttribute('ghost-model', '');
+        this.el.appendChild(preview);
+        this.preview = preview;
     },
 
     tick: function () {
-        if (ARState.yaPuesto) return;
-        let info = document.getElementById('instruction');
+        if (ARState.isPlaced) return;
+
+        const info = document.getElementById('instruction');
         if (this.el.sceneEl.is('ar-mode')) {
             if (!this.preview) this.updatePreview();
             if (!this.hitSource || !this.localSpace) return;
-            let frame = this.el.sceneEl.frame;
+
+            const frame = this.el.sceneEl.frame;
             if (!frame) return;
-            let hits = frame.getHitTestResults(this.hitSource);
+
+            const hits = frame.getHitTestResults(this.hitSource);
             if (hits.length > 0) {
-                let pose = hits[0].getPose(this.localSpace);
+                const pose = hits[0].getPose(this.localSpace);
                 this.el.setAttribute('visible', 'true');
                 this.el.setAttribute('position', pose.transform.position);
-                info.innerText = "Toca para plantar el modelo";
+                info.innerText = "Tap anywhere to place the model";
             } else {
                 this.el.setAttribute('visible', 'false');
-                info.innerText = "Buscando suelo...";
+                info.innerText = "Finding floor...";
             }
         }
     }
