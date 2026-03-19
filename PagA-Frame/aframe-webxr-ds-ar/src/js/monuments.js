@@ -1,4 +1,4 @@
-export const MonumentData = [
+export const MonumentData = [ 
     {
         id: 'alanis',
         name: 'Alanís',

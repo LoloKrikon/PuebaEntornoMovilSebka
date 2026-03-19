@@ -1,4 +1,4 @@
-export const Utils = {
+export const Utils = { 
     isAppleDevice: () => {
         const isIOS = [
             'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'

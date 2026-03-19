@@ -1,4 +1,4 @@
-export const ARState = {
+export const ARState = { 
     modelUrl: "",
     currentScale: "1 1 1",
     isPlaced: false
