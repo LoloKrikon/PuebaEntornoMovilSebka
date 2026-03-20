@@ -24,7 +24,7 @@ En lugar de escribir los botones a mano en el HTML, el código JavaScript haría
 fetch('https://api.tuweb.com/get-monumentos')
   .then(res => res.json())
   .then(data => {
-    // Aquí el código crearía los botones automáticamente
+    // Aquí se crearía los botones automáticamente
     data.forEach(monumento => {
       crearBoton(monumento);
     });

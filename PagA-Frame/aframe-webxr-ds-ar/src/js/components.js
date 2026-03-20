@@ -15,21 +15,6 @@ AFRAME.registerShader('shadow-material', {
     }
 });
 
-AFRAME.registerComponent('ghost-model', {
-    init: function () {
-        this.el.addEventListener('model-loaded', () => {
-            const mesh = this.el.getObject3D('mesh');
-            if (mesh) {
-                mesh.traverse(node => {
-                    if (node.isMesh) {
-                        node.material.transparent = true;
-                        node.material.opacity = 0.5;
-                    }
-                });
-            }
-        });
-    }
-});
 
 AFRAME.registerComponent('ar-controls', {
     init: function () {
@@ -87,7 +72,6 @@ AFRAME.registerComponent('hit-test-handler', {
         this.localSpace = null;
         this.modelObj = null;
         this.shadowPlane = null;
-        this.preview = null;
 
         const info = document.getElementById('instruction');
         const loading = document.getElementById('loading-text');
@@ -154,38 +138,18 @@ AFRAME.registerComponent('hit-test-handler', {
             self.hitSource = null;
             if (self.shadowPlane) self.el.sceneEl.removeChild(self.shadowPlane);
             if (self.modelObj) self.el.sceneEl.removeChild(self.modelObj);
-            if (self.preview) self.el.removeChild(self.preview);
             
-            self.preview = null;
             document.getElementById('ar-button').style.display = 'block';
             ARState.isPlaced = false;
         });
     },
 
-    updatePreview: function () {
-        if (this.preview) this.el.removeChild(this.preview);
-
-        const preview = document.createElement('a-entity');
-        preview.setAttribute('gltf-model', ARState.modelUrl);
-
-        const scale = ARState.currentScale.split(' ');
-        preview.setAttribute('scale', { 
-            x: parseFloat(scale[0]), 
-            y: parseFloat(scale[1]), 
-            z: parseFloat(scale[2]) 
-        });
-
-        preview.setAttribute('ghost-model', '');
-        this.el.appendChild(preview);
-        this.preview = preview;
-    },
 
     tick: function () {
         if (ARState.isPlaced) return;
 
         const info = document.getElementById('instruction');
         if (this.el.sceneEl.is('ar-mode')) {
-            if (!this.preview) this.updatePreview();
             if (!this.hitSource || !this.localSpace) return;
 
             const frame = this.el.sceneEl.frame;
