@@ -61,6 +61,11 @@
           };
           findVideo(obj);
           if (videoEl) {
+            // SOLUCIONES iOS: Forzamos la reproducción dentro del plano y sin pantalla completa
+            videoEl.setAttribute('playsinline', '');
+            videoEl.setAttribute('webkit-playsinline', '');
+            videoEl.muted = false; // Como el usuario ha hecho clic, ya podemos darle sonido
+            
             videoEl.currentTime = 0;
             videoEl.play();
           }
