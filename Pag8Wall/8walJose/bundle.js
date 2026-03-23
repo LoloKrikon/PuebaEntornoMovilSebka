@@ -23,9 +23,9 @@
 
   // Añadimos controles de vídeo (pausado hasta pulsar botón, una sola reproducción)
   sceneConfig.objects[PLANO_ID].videoControls = {
-    volume: 0,     // PUNTO 1: Silenciamos de origen para que el iPhone cargue el vídeo sin errores
+    volume: 1,
     loop: false,
-    paused: true,  // PUNTO 2: Lo dejamos pausado para que el navegador lo considere seguro
+    paused: true,
   };
 
   // Register the plano-controller component (attached directly to the Plano entity)
@@ -61,11 +61,6 @@
           };
           findVideo(obj);
           if (videoEl) {
-            // SOLUCIONES iOS: Forzamos la reproducción dentro del plano y sin pantalla completa
-            videoEl.setAttribute('playsinline', '');
-            videoEl.setAttribute('webkit-playsinline', '');
-            videoEl.muted = false; // Como el usuario ha hecho clic, ya podemos darle sonido
-            
             videoEl.currentTime = 0;
             videoEl.play();
           }
