@@ -18,12 +18,12 @@
   sceneConfig.objects[PLANO_ID].material = {
     type: 'video',
     color: '#FFFFFF',
-    textureSrc: 'video1.mp4',
+    textureSrc: 'video_iphone.mp4',
   };
 
   // Añadimos controles de vídeo (pausado hasta pulsar botón, una sola reproducción)
   sceneConfig.objects[PLANO_ID].videoControls = {
-    volume: 1,
+    volume: 0, // Empezamos en silencio para que iOS deje cargar el vídeo
     loop: false,
     paused: true,
   };
@@ -61,6 +61,11 @@
           };
           findVideo(obj);
           if (videoEl) {
+            // SOLUCIONES iOS: Forzamos el plano y le damos volumen tras el clic del usuario
+            videoEl.setAttribute('playsinline', '');
+            videoEl.setAttribute('webkit-playsinline', '');
+            videoEl.muted = false; // Ahora el usuario puede oírlo
+            
             videoEl.currentTime = 0;
             videoEl.play();
           }
