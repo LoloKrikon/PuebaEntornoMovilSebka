@@ -31,3 +31,22 @@ El código escucha al botón con ID `show-plano-btn`:
 ## 📍 Conclusión para los Monumentos
 Este sistema es ideal si más adelante queremos que tus castillos tengan un **guía virtual** (un vídeo de una persona explicando la historia) que aparezca delante del monumento con el fondo transparente.
 
+---
+
+## Nuevas cosas (Solución Pantallazo Negro iOS)
+
+Para que el proyecto de Jose sea compatible con iPhone, hemos aplicado los **"3 Puntos de Oro"** de Apple:
+
+### 1. Volumen Silenciado de Origen (`volume: 0`)
+Al configurar el vídeo con volumen cero nada más entrar, Safari en el iPhone ya no bloquea la carga del archivo. Esto soluciona que el plano saliese de color negro en los dispositivos iOS.
+
+### 2. Autoreproducción Desactivada (`paused: true`)
+8th Wall respeta la política de Safari y no intenta reproducir el vídeo solo. De esta forma, el navegador "pre-carga" el archivo `video1.mp4` y lo deja listo en el sistema para que, cuando el usuario le dé al botón, la respuesta sea instantánea.
+
+### 3. Activación con Interacción (Pendiente)
+La lógica está preparada para que, al pulsar el botón de **"Mostrar Plano"**, el código recupere el volumen original (`muted = false`). De esta forma, lo que antes era un error ahora es una ventaja: cumplimos la ley de Apple y a la vez ofrecemos una buena experiencia al usuario.
+
+---
+
+*Guía de análisis actualizada por Antigravity para Lolo · Marzo 2026*
+

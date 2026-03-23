@@ -21,11 +21,11 @@
     textureSrc: 'video1.mp4',
   };
 
-  // Add video controls (paused until button is pressed, single play)
+  // Añadimos controles de vídeo (pausado hasta pulsar botón, una sola reproducción)
   sceneConfig.objects[PLANO_ID].videoControls = {
-    volume: 1,
+    volume: 0,     // PUNTO 1: Silenciamos de origen para que el iPhone cargue el vídeo sin errores
     loop: false,
-    paused: true,
+    paused: true,  // PUNTO 2: Lo dejamos pausado para que el navegador lo considere seguro
   };
 
   // Register the plano-controller component (attached directly to the Plano entity)
