@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>ar_holograma</title>
+
+  <!-- Open Graph / Social Meta -->
+  <meta itemprop="name" content="ar_holograma">
+  <meta name="twitter:title" content="ar_holograma">
+  <meta property="og:title" content="ar_holograma">
+  <meta property="og:site_name" content="ar_holograma">
+
+  <meta name="description" content="ar_holograma.">
+  <meta itemprop="description" content="ar_holograma.">
+  <meta property="og:description" content="ar_holograma.">
+  <meta name="twitter:description" content="ar_holograma.">
+
+  <!-- 8th Wall Scripts -->
+  <script crossorigin="anonymous" src="./external/runtime/runtime.js"></script>
+  <script crossorigin="anonymous" src="./external/xr/xr.js" async="true" data-preload-chunks="face, slam"></script>
+
+  <style>
+    /* Button to show the Plano */
+    #show-plano-btn {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+
+      padding: 14px 36px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+
+      /* Gradient background */
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #ffffff;
+      font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+
+      /* Soft shadow */
+      box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+
+      /* Smooth transitions */
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+    }
+
+    #show-plano-btn:hover {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 8px 28px rgba(0, 114, 255, 0.55);
+    }
+
+    #show-plano-btn:active {
+      transform: translateX(-50%) scale(0.97);
+      box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Button to show the Plano in AR -->
+  <button id="show-plano-btn">Mostrar Plano</button>
+
+  <script src="bundle.js"></script>
+</body>
+
+</html>

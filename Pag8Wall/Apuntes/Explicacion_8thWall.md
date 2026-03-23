@@ -57,7 +57,5 @@ Aquí es donde controlamos todo el aspecto visual:
 *   **Carga del GLB:** Usamos el `GLTFLoader` de Three.js para traer el archivo del castillo. Lo ponemos como `visible = false` al principio para que no aparezca antes de que el motor de rastreo esté listo.
 *   **El Canvas:** Es el lienzo donde se dibuja todo. 8th Wall se encarga de superponerlo perfectamente sobre el vídeo de la cámara.
 
----
 
-*Guía actualizada por Antigravity para Lolo · Marzo 2026*
 
