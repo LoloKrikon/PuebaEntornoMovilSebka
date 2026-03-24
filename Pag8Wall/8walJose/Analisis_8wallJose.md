@@ -46,7 +46,8 @@ Al configurar el vídeo con volumen cero nada más entrar, Safari en el iPhone y
 ### 3. Activación con Interacción (Pendiente)
 La lógica está preparada para que, al pulsar el botón de **"Mostrar Plano"**, el código recupere el volumen original (`muted = false`). De esta forma, lo que antes era un error ahora es una ventaja: cumplimos la ley de Apple y a la vez ofrecemos una buena experiencia al usuario.
 
----
+### 4. Escala Real AR (Aplicado)
+Hemos ajustado el modelo a una escala humana real de **1.80m de altura** (escala `[1.6, 1.8, 1.6]`) y lo hemos colocado a **2.5 metros** de distancia del usuario. Esto asegura que el holograma se vea integrado en el entorno y no como un gigante en la lejanía.
 
-*Guía de análisis actualizada por Antigravity para Lolo · Marzo 2026*
+
 
