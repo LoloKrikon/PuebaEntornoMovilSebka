@@ -60,15 +60,19 @@
       transform: translateX(-50%) scale(0.97);
       box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
     }
-
-    /* Botón de Silencio Premium */
-    #mute-btn {
+    /* Panel de controles del holograma */
+    #controles-ar {
       position: fixed;
       bottom: 40px;
       right: 20px;
       z-index: 9999;
-      width: 54px;
-      height: 54px;
+      display: none; /* Se activa al empezar */
+      gap: 12px;
+    }
+
+    .btn-ar {
+      width: 52px;
+      height: 52px;
       border: none;
       border-radius: 50%;
       cursor: pointer;
@@ -77,17 +81,16 @@
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.25);
       color: #ffffff;
-      font-size: 22px;
+      font-size: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: none;
+      transition: all 0.2s ease;
     }
 
-    #mute-btn:active {
-      transform: scale(0.85);
+    .btn-ar:active {
+      transform: scale(0.9);
       background: rgba(255, 255, 255, 0.25);
     }
   </style>
@@ -108,30 +111,54 @@
   <!-- Button to show the Plano in AR -->
   <button id="show-plano-btn">Mostrar Plano</button>
 
-  <!-- Botón de Mute Dinámico -->
-  <button id="mute-btn">🔊</button>
+  <!-- Controles interactivos -->
+  <div id="controles-ar">
+    <button id="btn-reset" class="btn-ar">↺</button>
+    <button id="btn-pause" class="btn-ar">⏸</button>
+    <button id="btn-mute" class="btn-ar">🔊</button>
+  </div>
 
   <script src="bundle.js"></script>
 
-  <!-- Lógica de Silencio (Separada del motor de Jose) -->
   <script>
+    // Mis controles AR
     const video = document.getElementById('video');
-    const startBtn = document.getElementById('show-plano-btn');
-    const muteBtn = document.getElementById('mute-btn');
+    const panel = document.getElementById('controles-ar');
+    const b_inicio = document.getElementById('show-plano-btn');
+    
+    const b_mute = document.getElementById('btn-mute');
+    const b_pause = document.getElementById('btn-pause');
+    const b_reset = document.getElementById('btn-reset');
 
-    startBtn.addEventListener('click', () => {
-      muteBtn.style.display = 'flex';
-      muteBtn.innerText = '🔊';
+    b_inicio.addEventListener('click', () => {
+      panel.style.display = 'flex';
+      b_mute.innerText = '🔊';
+      b_pause.innerText = '⏸';
     });
 
-    muteBtn.addEventListener('click', () => {
+    b_mute.addEventListener('click', () => {
       video.muted = !video.muted;
-      muteBtn.innerText = video.muted ? '🔇' : '🔊';
+      b_mute.innerText = video.muted ? '🔇' : '🔊';
+    });
+
+    b_pause.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        b_pause.innerText = '⏸';
+      } else {
+        video.pause();
+        b_pause.innerText = '▶';
+      }
+    });
+
+    b_reset.addEventListener('click', () => {
+      video.currentTime = 0;
+      video.play();
+      b_pause.innerText = '⏸';
     });
 
     video.addEventListener('ended', () => {
-      muteBtn.style.display = 'none';
-      muteBtn.innerText = '🔊';
+      panel.style.display = 'none';
     });
   </script>
 </body>

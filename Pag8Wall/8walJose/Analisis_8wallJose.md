@@ -49,9 +49,11 @@ La lógica está preparada para que, al pulsar el botón de **"Mostrar Plano"**,
 ### 4. Escala Real AR (Aplicado)
 Hemos ajustado el modelo a una escala humana real de **1.80m de altura** (escala `[1.6, 1.8, 1.6]`) y lo hemos colocado a **2.5 metros** de distancia del usuario. Esto asegura que el holograma se vea integrado en el entorno y no como un gigante en la lejanía.
 
-### 5. Botón de Mute Interactivo (Aplicado)
-Hemos integrado un botón de silencio dinámico en la esquina inferior derecha. 
-*   **Diseño**: Estilo "Glassmorphism" translúcido para que se vea moderno y no tape la cámara.
-*   **Lógica**: El botón solo aparece una vez que se inicia el holograma y permite al usuario activar/desactivar el sonido cómodamente sin interrumpir la experiencia.
+### 5. Panel de Control Interactivo (Aplicado)
+Hemos expandido la interfaz con un panel completo de control:
+*   **Pausa y Play**: Permite detener al guía virtual en cualquier momento.
+*   **Silencio dinámico**: Control de sonido con estilo "Glassmorphism".
+*   **Reinicio**: Botón para que el vídeo vuelva al principio al instante.
+*   **Diseño**: Integrado en un grupo de botones flotantes que respetan la visibilidad de la cámara.
 
 -
