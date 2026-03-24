@@ -18,7 +18,7 @@
   sceneConfig.objects[PLANO_ID].material = {
     type: 'video',
     color: '#FFFFFF',
-    textureSrc: 'video_iphone.mp4',
+    textureSrc: 'video_iphone_p.mp4',
   };
 
   // Añadimos controles de vídeo (pausado hasta pulsar botón, una sola reproducción)
