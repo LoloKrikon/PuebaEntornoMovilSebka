@@ -9,26 +9,17 @@
   delete sceneConfig.history;
   delete sceneConfig.historyVersion;
 
-  // Hide the Plano initially using the 'hidden' property
-  // (hidden: true creates the entity but keeps it invisible, unlike disabled which prevents creation)
+  // Hide the Plano initially
   const PLANO_ID = 'd3ffc867-4fc4-45b1-a1eb-6ed3316a2496';
   sceneConfig.objects[PLANO_ID].hidden = true;
 
-  // Set Plano material to video with video1.mp4
+  // Keep basic material — we apply video texture manually from our HTML <video>
   sceneConfig.objects[PLANO_ID].material = {
-    type: 'video',
-    color: '#FFFFFF',
-    textureSrc: 'video_iphone_p.mp4',
+    type: 'basic',
+    color: '#000000',
   };
 
-  // Añadimos controles de vídeo (pausado hasta pulsar botón, una sola reproducción)
-  sceneConfig.objects[PLANO_ID].videoControls = {
-    volume: 0, // Empezamos en silencio para que iOS deje cargar el vídeo
-    loop: false,
-    paused: true,
-  };
-
-  // Register the plano-controller component (attached directly to the Plano entity)
+  // Register the plano-controller component
   ecs.registerComponent({
     name: 'plano-controller',
     schema: {},
@@ -38,117 +29,115 @@
     add: (world, component) => {
       const planoEid = component.eid;
 
+      // Reference the HTML <video> element directly
+      const video = document.getElementById('video');
       const btn = document.getElementById('show-plano-btn');
-      if (!btn) return;
+      if (!btn || !video) return;
 
-      btn.addEventListener('click', () => {
-        const entity = world.getEntity(planoEid);
-        if (entity) {
-          entity.show();
-        }
+      // Cache mesh reference (found in tick)
+      let cachedMesh = null;
 
-        // Reset the video to the beginning and play
-        const obj = world.three.entityToObject.get(planoEid);
-        if (obj) {
-          let videoEl = null;
-          const findVideo = (o) => {
-            if (o.isMesh && o.material && o.material.uniforms &&
-              o.material.uniforms.videoTexture) {
-              const tex = o.material.uniforms.videoTexture.value;
-              if (tex && tex.image && tex.image.play) videoEl = tex.image;
-            }
-            if (o.children) o.children.forEach(findVideo);
-          };
-          findVideo(obj);
-          if (videoEl) {
-            // SOLUCIONES iOS: Forzamos el plano y le damos volumen tras el clic del usuario
-            videoEl.setAttribute('playsinline', '');
-            videoEl.setAttribute('webkit-playsinline', '');
-            videoEl.muted = false; // Ahora el usuario puede oírlo
-            
-            videoEl.currentTime = 0;
-            videoEl.play();
-          }
-        }
-
-        btn.style.display = 'none';
-      });
-    },
-    tick: (world, component) => {
-      // Apply chroma key shader once, after the video texture is ready
-      if (component.data.chromaApplied) return;
-
-      const planoEid = component.eid;
-      const obj3D = world.three.entityToObject.get(planoEid);
-      if (!obj3D) return;
-
-      // Find the mesh (could be the object itself or a child)
-      let mesh = null;
-      if (obj3D.isMesh) {
-        mesh = obj3D;
-      } else {
+      // Helper: find the mesh from the 3D object
+      const findMesh = () => {
+        const obj3D = world.three.entityToObject.get(planoEid);
+        if (!obj3D) return null;
+        if (obj3D.isMesh) return obj3D;
+        let mesh = null;
         obj3D.traverse((child) => {
           if (child.isMesh && !mesh) mesh = child;
         });
-      }
-      if (!mesh || !mesh.material || !mesh.material.map) return;
+        return mesh;
+      };
 
-      // Video texture is loaded — apply chroma key via THREE.ShaderMaterial
-      const videoTexture = mesh.material.map;
+      // Helper: apply chroma key video texture to a mesh
+      const applyVideoTexture = (mesh) => {
+        const videoTexture = new window.THREE.VideoTexture(video);
+        videoTexture.minFilter = window.THREE.LinearFilter;
+        videoTexture.magFilter = window.THREE.LinearFilter;
+        videoTexture.format = window.THREE.RGBAFormat;
 
-      // Create a proper chroma key ShaderMaterial using window.THREE
-      const chromaKeyMaterial = new window.THREE.ShaderMaterial({
-        uniforms: {
-          videoTexture: { value: videoTexture },
-          chromaColor: { value: new window.THREE.Color(0.1, 0.9, 0.2) },
-          threshold: { value: 0.4 },
-          smoothing: { value: 0.1 },
-        },
-        vertexShader: [
-          'varying vec2 vUv;',
-          'void main() {',
-          '  vUv = uv;',
-          '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
-          '}',
-        ].join('\n'),
-        fragmentShader: [
-          'uniform sampler2D videoTexture;',
-          'uniform vec3 chromaColor;',
-          'uniform float threshold;',
-          'uniform float smoothing;',
-          'varying vec2 vUv;',
-          'void main() {',
-          '  vec4 texColor = texture2D(videoTexture, vUv);',
-          '  float chromaDist = distance(texColor.rgb, chromaColor);',
-          '  float alpha = smoothstep(threshold, threshold + smoothing, chromaDist);',
-          '  gl_FragColor = vec4(texColor.rgb, alpha);',
-          '}',
-        ].join('\n'),
-        transparent: true,
-        side: window.THREE.DoubleSide,
+        const chromaKeyMaterial = new window.THREE.ShaderMaterial({
+          uniforms: {
+            videoTexture: { value: videoTexture },
+            chromaColor: { value: new window.THREE.Color(0.1, 0.9, 0.2) },
+            threshold: { value: 0.4 },
+            smoothing: { value: 0.1 },
+          },
+          vertexShader: [
+            'varying vec2 vUv;',
+            'void main() {',
+            '  vUv = uv;',
+            '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+            '}',
+          ].join('\n'),
+          fragmentShader: [
+            'uniform sampler2D videoTexture;',
+            'uniform vec3 chromaColor;',
+            'uniform float threshold;',
+            'uniform float smoothing;',
+            'varying vec2 vUv;',
+            'void main() {',
+            '  vec4 texColor = texture2D(videoTexture, vUv);',
+            '  float chromaDist = distance(texColor.rgb, chromaColor);',
+            '  float alpha = smoothstep(threshold, threshold + smoothing, chromaDist);',
+            '  gl_FragColor = vec4(texColor.rgb, alpha);',
+            '}',
+          ].join('\n'),
+          transparent: true,
+          side: window.THREE.DoubleSide,
+        });
+
+        mesh.material = chromaKeyMaterial;
+      };
+
+      btn.addEventListener('click', () => {
+        // 1. Play the video FIRST (iOS user-gesture pattern)
+        video.muted = false;
+        video.volume = 1;
+        video.currentTime = 0;
+        video.play();
+
+        // 2. Apply video texture to the mesh (while plane is still hidden)
+        const mesh = cachedMesh || findMesh();
+        if (mesh) {
+          applyVideoTexture(mesh);
+        }
+
+        // 3. Wait 2 frames so the first video frame renders into the texture,
+        //    THEN show the plane — avoids the black flash
+        const entity = world.getEntity(planoEid);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (entity) {
+              entity.show();
+            }
+          });
+        });
+
+        btn.style.display = 'none';
       });
 
-      mesh.material = chromaKeyMaterial;
+      // When video ends: hide plano, show button again
+      video.addEventListener('ended', () => {
+        const entity = world.getEntity(planoEid);
+        if (entity) {
+          entity.hide();
+        }
+        btn.style.display = '';
+      });
+    },
+    tick: (world, component) => {
+      // Cache the mesh reference so it's ready when the button is clicked
+      if (component.data.chromaApplied) return;
+      const planoEid = component.eid;
+      const obj3D = world.three.entityToObject.get(planoEid);
+      if (!obj3D) return;
+      // Just mark as done once we confirm the object exists
       component.data.chromaApplied = true;
-
-      // Listen for video end: hide Plano and show button again
-      const videoElement = videoTexture.image; // HTMLVideoElement
-      if (videoElement && videoElement.addEventListener) {
-        const btn = document.getElementById('show-plano-btn');
-        videoElement.addEventListener('ended', () => {
-          const entity = world.getEntity(planoEid);
-          if (entity) {
-            entity.hide();
-          }
-          if (btn) {
-            btn.style.display = '';
-          }
-        });
-      }
     },
   });
 
-  // Attach the plano-controller component to the Plano entity in the config
+  // Attach the plano-controller component to the Plano entity
   sceneConfig.objects[PLANO_ID].components['plano-controller'] = {
     id: 'plano-controller',
     name: 'plano-controller',
