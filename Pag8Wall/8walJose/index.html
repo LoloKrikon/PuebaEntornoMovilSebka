@@ -60,6 +60,36 @@
       transform: translateX(-50%) scale(0.97);
       box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
     }
+
+    /* Botón de Silencio Premium */
+    #mute-btn {
+      position: fixed;
+      bottom: 40px;
+      right: 20px;
+      z-index: 9999;
+      width: 54px;
+      height: 54px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: none;
+    }
+
+    #mute-btn:active {
+      transform: scale(0.85);
+      background: rgba(255, 255, 255, 0.25);
+    }
   </style>
 </head>
 
@@ -78,7 +108,32 @@
   <!-- Button to show the Plano in AR -->
   <button id="show-plano-btn">Mostrar Plano</button>
 
+  <!-- Botón de Mute Dinámico -->
+  <button id="mute-btn">🔊</button>
+
   <script src="bundle.js"></script>
+
+  <!-- Lógica de Silencio (Separada del motor de Jose) -->
+  <script>
+    const video = document.getElementById('video');
+    const startBtn = document.getElementById('show-plano-btn');
+    const muteBtn = document.getElementById('mute-btn');
+
+    startBtn.addEventListener('click', () => {
+      muteBtn.style.display = 'flex';
+      muteBtn.innerText = '🔊';
+    });
+
+    muteBtn.addEventListener('click', () => {
+      video.muted = !video.muted;
+      muteBtn.innerText = video.muted ? '🔇' : '🔊';
+    });
+
+    video.addEventListener('ended', () => {
+      muteBtn.style.display = 'none';
+      muteBtn.innerText = '🔊';
+    });
+  </script>
 </body>
 
 </html>
