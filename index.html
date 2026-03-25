@@ -1,143 +1,166 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html>
 
 <head>
-    <meta charset="utf-8">
-    <title>Proyectos AR</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #111;
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px 20px;
-        }
+  <title>ar_holograma</title>
 
-        h1 {
-            font-size: 1.6rem;
-            margin-bottom: 8px;
-            text-align: center;
-        }
+  <!-- Open Graph / Social Meta -->
+  <meta itemprop="name" content="ar_holograma">
+  <meta name="twitter:title" content="ar_holograma">
+  <meta property="og:title" content="ar_holograma">
+  <meta property="og:site_name" content="ar_holograma">
 
-        p {
-            color: #aaa;
-            font-size: 0.95rem;
-            margin-bottom: 40px;
-            text-align: center;
-        }
+  <meta name="description" content="ar_holograma.">
+  <meta itemprop="description" content="ar_holograma.">
+  <meta property="og:description" content="ar_holograma.">
+  <meta name="twitter:description" content="ar_holograma.">
 
-        .cards {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            width: 100%;
-            max-width: 420px;
-        }
+  <!-- 8th Wall Scripts -->
+  <script crossorigin="anonymous" src="./external/runtime/runtime.js"></script>
+  <script crossorigin="anonymous" src="./external/xr/xr.js" async="true" data-preload-chunks="face, slam"></script>
 
-        .card {
-            display: block;
-            background-color: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 22px 20px;
-            text-decoration: none;
-            color: white;
-            transition: background-color 0.15s, border-color 0.15s;
-        }
+  <style>
+    /* Button to show the Plano */
+    #show-plano-btn {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
 
-        .card:active {
-            background-color: #2a2a2a;
-        }
+      padding: 14px 36px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
 
-        .card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-        }
+      /* Gradient background */
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #ffffff;
+      font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
 
-        .card span {
-            font-size: 0.85rem;
-            color: #888;
-        }
+      /* Soft shadow */
+      box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
 
-        .tag {
-            display: inline-block;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
+      /* Smooth transitions */
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+    }
 
-        .tag-blue {
-            background-color: #1565c0;
-            color: #fff;
-        }
+    #show-plano-btn:hover {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 8px 28px rgba(0, 114, 255, 0.55);
+    }
 
-        .tag-green {
-            background-color: #2e7d32;
-            color: #fff;
-        }
+    #show-plano-btn:active {
+      transform: translateX(-50%) scale(0.97);
+      box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
+    }
+    /* Panel de controles del holograma */
+    #controles-ar {
+      position: fixed;
+      bottom: 40px;
+      right: 20px;
+      z-index: 9999;
+      display: none; /* Se activa al empezar */
+      gap: 12px;
+    }
 
-        .tag-orange {
-            background-color: #e65100;
-            color: #fff;
-        }
+    .btn-ar {
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
 
-        footer {
-            margin-top: 50px;
-            color: #444;
-            font-size: 0.75rem;
-        }
-    </style>
+    .btn-ar:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.25);
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Elemento de vídeo oculto para el sistema de Jose Manuel -->
+  <video id="video" 
+    src="video1.mp4" 
+    playsinline 
+    webkit-playsinline 
+    muted 
+    crossorigin="anonymous" 
+    loop="false" 
+    style="display:none">
+  </video>
 
-    <h1>Proyectos de Realidad Aumentada</h1>
-    <p>Elige el proyecto que quieres abrir</p>
+  <!-- Button to show the Plano in AR -->
+  <button id="show-plano-btn">Mostrar Plano</button>
 
-    <div class="cards">
+  <!-- Controles interactivos -->
+  <div id="controles-ar">
+    <button id="btn-reset" class="btn-ar">↺</button>
+    <button id="btn-pause" class="btn-ar">⏸</button>
+    <button id="btn-mute" class="btn-ar">🔊</button>
+  </div>
 
-        <a class="card" href="./Pag8Wall/8walJose/index.html">
-            <div class="tag tag-blue">8th Wall AR</div>
-            <h2>Proyecto 8th Wall</h2>
-            <span>Experiencia de realidad aumentada en el navegador sin visor nativo</span>
-        </a>
+  <script src="bundle.js"></script>
 
-        <a class="card" href="./ProyectosAnteriores/PagA-Frame/aframe-webxr-ds-ar/index.html">
-            <div class="tag tag-blue">A-Frame + WebXR</div>
-            <h2>Proyecto A-Frame</h2>
-            <span>Modelos 3D anclados al suelo en realidad aumentada sin marcadores</span>
-        </a>
+  <script>
+    // Mis controles AR
+    const video = document.getElementById('video');
+    const panel = document.getElementById('controles-ar');
+    const b_inicio = document.getElementById('show-plano-btn');
+    
+    const b_mute = document.getElementById('btn-mute');
+    const b_pause = document.getElementById('btn-pause');
+    const b_reset = document.getElementById('btn-reset');
 
-        <a class="card" href="./ProyectosAnteriores/PagNeedle/ar-mindar/dist/index.html">
-            <div class="tag tag-green">Needle Engine</div>
-            <h2>Proyecto Needle</h2>
-            <span>Experiencia AR con motor gráfico avanzado basado en Three.js</span>
-        </a>
+    b_inicio.addEventListener('click', () => {
+      panel.style.display = 'flex';
+      b_mute.innerText = '🔊';
+      b_pause.innerText = '⏸';
+    });
 
-        <a class="card" href="./ProyectosAnteriores/PagEscEnara/ar-mindar/index.html">
-            <div class="tag tag-orange">AR.js + MindAR</div>
-            <h2>Proyecto Escaner AR-Mindar</h2>
-            <span>Realidad aumentada con reconocimiento de imagen mediante marcador</span>
-        </a>
+    b_mute.addEventListener('click', () => {
+      video.muted = !video.muted;
+      b_mute.innerText = video.muted ? '🔇' : '🔊';
+    });
 
-    </div>
+    b_pause.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        b_pause.innerText = '⏸';
+      } else {
+        video.pause();
+        b_pause.innerText = '▶';
+      }
+    });
 
-    <footer>Proyectos · 2026 </footer>
+    b_reset.addEventListener('click', () => {
+      video.currentTime = 0;
+      video.play();
+      b_pause.innerText = '⏸';
+    });
 
+    video.addEventListener('ended', () => {
+      panel.style.display = 'none';
+    });
+  </script>
 </body>
 
 </html>

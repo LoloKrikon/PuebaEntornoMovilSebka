@@ -1,0 +1,155 @@
+(() => {
+  "use strict";
+
+  // Configuración de la escena (Ajustado a escala humana real: 1.80m de alto a 2.5m del usuario)
+  const sceneConfig = JSON.parse(
+    '{"objects":{"47699d9e-18a5-4f88-a4f9-b8be92e8f74a":{"components":{},"geometry":null,"id":"47699d9e-18a5-4f88-a4f9-b8be92e8f74a","light":{"type":"ambient"},"material":null,"name":"Ambient Light","position":[10,5,5],"rotation":[0,0,0,1],"scale":[1,1,1],"parentId":"88453035-dc0f-486d-868a-8ff7c2fda864","order":0.4038940050501252},"729478ae-d067-4e0c-a753-66c2e9efb625":{"components":{},"geometry":{"depth":1,"height":1,"type":"box","width":1},"id":"729478ae-d067-4e0c-a753-66c2e9efb625","material":{"color":"#5577ff","type":"basic","textureFiltering":"sharp"},"name":"Box","position":[0,0.5,0],"rotation":[0,0,0,1],"scale":[1,1,1],"parentId":"88453035-dc0f-486d-868a-8ff7c2fda864","order":1.4038940050501252,"disabled":true},"a608ddd9-9379-464d-966f-5d8d8674c83c":{"camera":{"type":"perspective","xr":{"desktop":"disabled","xrCameraType":"world","headset":"disabled","phone":"AR"}},"components":{},"geometry":null,"id":"a608ddd9-9379-464d-966f-5d8d8674c83c","material":null,"name":"Camera","position":[0,4.830098554555251,6.515459905766417],"rotation":[-1.8412919444518387e-17,0.9537169517857893,-0.30070579621354565,-5.839832572618051e-17],"scale":[0.9999998646558023,0.9999999931513284,0.9999998715044741],"parentId":"88453035-dc0f-486d-868a-8ff7c2fda864","order":1.0308214152219775},"ac1989e3-3b71-49e2-a05f-e682aeb18c36":{"components":{},"geometry":null,"id":"ac1989e3-3b71-49e2-a05f-e682aeb18c36","light":{"intensity":1,"type":"directional"},"material":null,"name":"Directional Light","position":[20,20,10],"rotation":[0,0,0,1],"scale":[1,1,1],"parentId":"88453035-dc0f-486d-868a-8ff7c2fda864","order":0.6644431107322474},"d3ffc867-4fc4-45b1-a1eb-6ed3316a2496":{"id":"d3ffc867-4fc4-45b1-a1eb-6ed3316a2496","position":[0,0.9,-2.5],"rotation":[0,0,0,1],"scale":[1.6,1.8,1.6],"geometry":{"type":"plane","width":1,"height":1},"material":{"type":"basic","color":"#FFFFFF"},"parentId":"88453035-dc0f-486d-868a-8ff7c2fda864","components":{},"name":"Plano","order":3.2115083484966447}},"spaces":{"88453035-dc0f-486d-868a-8ff7c2fda864":{"id":"88453035-dc0f-486d-868a-8ff7c2fda864","name":"Default","activeCamera":"a608ddd9-9379-464d-966f-5d8d8674c83c","reflections":{"type":"url","url":"https://cdn.8thwall.com/web/assets/envmap/basic_env_map-m9hqpneh.jpg"}}},"entrySpaceId":"88453035-dc0f-486d-868a-8ff7c2fda864","runtimeVersion":{"type":"version","level":"major","major":2,"minor":0,"patch":0}}'
+  );
+
+  delete sceneConfig.history;
+  delete sceneConfig.historyVersion;
+
+  // Hide the Plano initially
+  const PLANO_ID = 'd3ffc867-4fc4-45b1-a1eb-6ed3316a2496';
+  sceneConfig.objects[PLANO_ID].hidden = true;
+
+  // Keep basic material — we apply video texture manually from our HTML <video>
+  sceneConfig.objects[PLANO_ID].material = {
+    type: 'basic',
+    color: '#000000',
+  };
+
+  // Register the plano-controller component
+  ecs.registerComponent({
+    name: 'plano-controller',
+    schema: {},
+    data: {
+      chromaApplied: ecs.boolean,
+    },
+    add: (world, component) => {
+      const planoEid = component.eid;
+
+      // Reference the HTML <video> element directly
+      const video = document.getElementById('video');
+      const btn = document.getElementById('show-plano-btn');
+      if (!btn || !video) return;
+
+      // Cache mesh reference (found in tick)
+      let cachedMesh = null;
+
+      // Helper: find the mesh from the 3D object
+      const findMesh = () => {
+        const obj3D = world.three.entityToObject.get(planoEid);
+        if (!obj3D) return null;
+        if (obj3D.isMesh) return obj3D;
+        let mesh = null;
+        obj3D.traverse((child) => {
+          if (child.isMesh && !mesh) mesh = child;
+        });
+        return mesh;
+      };
+
+      // Helper: apply chroma key video texture to a mesh
+      const applyVideoTexture = (mesh) => {
+        const videoTexture = new window.THREE.VideoTexture(video);
+        videoTexture.minFilter = window.THREE.LinearFilter;
+        videoTexture.magFilter = window.THREE.LinearFilter;
+        videoTexture.format = window.THREE.RGBAFormat;
+
+        const chromaKeyMaterial = new window.THREE.ShaderMaterial({
+          uniforms: {
+            videoTexture: { value: videoTexture },
+            chromaColor: { value: new window.THREE.Color(0.1, 0.9, 0.2) },
+            threshold: { value: 0.4 },
+            smoothing: { value: 0.1 },
+          },
+          vertexShader: [
+            'varying vec2 vUv;',
+            'void main() {',
+            '  vUv = uv;',
+            '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+            '}',
+          ].join('\n'),
+          fragmentShader: [
+            'uniform sampler2D videoTexture;',
+            'uniform vec3 chromaColor;',
+            'uniform float threshold;',
+            'uniform float smoothing;',
+            'varying vec2 vUv;',
+            'void main() {',
+            '  vec4 texColor = texture2D(videoTexture, vUv);',
+            '  float chromaDist = distance(texColor.rgb, chromaColor);',
+            '  float alpha = smoothstep(threshold, threshold + smoothing, chromaDist);',
+            '  gl_FragColor = vec4(texColor.rgb, alpha);',
+            '}',
+          ].join('\n'),
+          transparent: true,
+          side: window.THREE.DoubleSide,
+        });
+
+        mesh.material = chromaKeyMaterial;
+      };
+
+      btn.addEventListener('click', () => {
+        // 1. Play the video FIRST (iOS user-gesture pattern)
+        video.muted = false;
+        video.volume = 1;
+        video.currentTime = 0;
+        video.play();
+
+        // 2. Apply video texture to the mesh (while plane is still hidden)
+        const mesh = cachedMesh || findMesh();
+        if (mesh) {
+          applyVideoTexture(mesh);
+        }
+
+        // 3. Wait 2 frames so the first video frame renders into the texture,
+        //    THEN show the plane — avoids the black flash
+        const entity = world.getEntity(planoEid);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (entity) {
+              entity.show();
+            }
+          });
+        });
+
+        btn.style.display = 'none';
+      });
+
+      // When video ends: hide plano, show button again
+      video.addEventListener('ended', () => {
+        const entity = world.getEntity(planoEid);
+        if (entity) {
+          entity.hide();
+        }
+        btn.style.display = '';
+      });
+    },
+    tick: (world, component) => {
+      // 1. Obtenemos el objeto 3D del holograma y verificamos que exista la cámara
+      const obj = world.three.entityToObject.get(component.eid);
+      if (!obj || !world.three.camera) return;
+
+      // 2. Calculamos las coordenadas exactas de dónde se encuentra el móvil (cámara)
+      const target = new window.THREE.Vector3();
+      world.three.camera.getWorldPosition(target);
+      
+      // 3. Igualamos la altura vertical (Y) para que el plano rote pero no se tumbe o incline
+      target.y = obj.position.y;
+      
+      // 4. Aplicamos la rotación matemática: "Holograma, mira hacia la cámara"
+      obj.lookAt(target);
+    },
+  });
+
+  // Attach the plano-controller component to the Plano entity
+  sceneConfig.objects[PLANO_ID].components['plano-controller'] = {
+    id: 'plano-controller',
+    name: 'plano-controller',
+    parameters: {},
+  };
+
+  // Initialize the ECS application
+  window.ecs.application.init(sceneConfig);
+})();
