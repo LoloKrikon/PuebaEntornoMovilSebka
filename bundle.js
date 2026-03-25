@@ -13,9 +13,9 @@
   const PLANO_ID = 'd3ffc867-4fc4-45b1-a1eb-6ed3316a2496';
   sceneConfig.objects[PLANO_ID].hidden = true;
   
-  // Aumentamos la escala para conseguir los ~1.80m físicos a una escala moderada y visible.
-  sceneConfig.objects[PLANO_ID].scale = [8, 9, 8];
-  sceneConfig.objects[PLANO_ID].position = [0, 4.5, -8];
+  // Ajuste de escala: restauramos a x20 (32, 36) pero mucho más cerca (Z=-15 en lugar de -30)
+  sceneConfig.objects[PLANO_ID].scale = [32, 36, 32];
+  sceneConfig.objects[PLANO_ID].position = [0, 18, -15];
 
   // Keep basic material — we apply video texture manually from our HTML <video>
   sceneConfig.objects[PLANO_ID].material = {
@@ -131,19 +131,28 @@
       });
     },
     tick: (world, component) => {
-      // 1. Obtenemos el objeto 3D del holograma y verificamos que exista la cámara
       const obj = world.three.entityToObject.get(component.eid);
       if (!obj || !world.three.camera) return;
 
-      // 2. Calculamos las coordenadas exactas de dónde se encuentra el móvil (cámara)
       const target = new window.THREE.Vector3();
       world.three.camera.getWorldPosition(target);
       
-      // 3. Igualamos la altura vertical (Y) para que el plano rote pero no se tumbe o incline
       target.y = obj.position.y;
       
-      // 4. Aplicamos la rotación matemática: "Holograma, mira hacia la cámara"
+      // Aplicamos la rotación matemática en el objeto 3D
       obj.lookAt(target);
+
+      // CRÍTICO: 8th Wall ECS sobrescribe la rotación física en cada frame.
+      // Debemos guardar el quaternion resultante en el sistema de entidades para que el motor visual lo aplique de verdad.
+      const entity = world.getEntity(component.eid);
+      if (entity) {
+        entity.set('rotation', {
+          x: obj.quaternion.x,
+          y: obj.quaternion.y,
+          z: obj.quaternion.z,
+          w: obj.quaternion.w
+        });
+      }
     },
   });
 
