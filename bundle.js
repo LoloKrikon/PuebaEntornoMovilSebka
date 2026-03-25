@@ -13,10 +13,9 @@
   const PLANO_ID = 'd3ffc867-4fc4-45b1-a1eb-6ed3316a2496';
   sceneConfig.objects[PLANO_ID].hidden = true;
   
-  // Ajuste masivo de escala: 8th Wall convierte internamente las proporciones. 
-  // Escala [32, 36, 32] asegura los ~1.80m físicos. Elevamos height (Y=18) para no hundirlo en el suelo, y lo dejamos a Z= -30.
-  sceneConfig.objects[PLANO_ID].scale = [32, 36, 32];
-  sceneConfig.objects[PLANO_ID].position = [0, 18, -30];
+  // Aumentamos la escala para conseguir los ~1.80m físicos a una escala moderada y visible.
+  sceneConfig.objects[PLANO_ID].scale = [8, 9, 8];
+  sceneConfig.objects[PLANO_ID].position = [0, 4.5, -8];
 
   // Keep basic material — we apply video texture manually from our HTML <video>
   sceneConfig.objects[PLANO_ID].material = {
