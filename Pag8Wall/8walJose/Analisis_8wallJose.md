@@ -56,4 +56,24 @@ Hemos expandido la interfaz con un panel completo de control:
 *   **Reinicio**: Botón para que el vídeo vuelva al principio al instante.
 *   **Diseño**: Integrado en un grupo de botones flotantes que respetan la visibilidad de la cámara.
 
--
+---
+
+## Resumen de Últimas Modificaciones (Estado Actual)
+
+*   **Arquitectura Local**
+: El proyecto no usa el Cloud Editor de 8th Wall. Las librerías (`xr.js`, `runtime.js`) están en `/external/`. No se usa *AppKey* ni etiquetas HTML de A-Frame; todo se gestiona mediante un sistema ECS inyectado por un JSON (`sceneConfig`) en `bundle.js`.
+
+*   **Holograma y Croma**
+: El núcleo es un vídeo con fondo verde (`video1.mp4`). Se utiliza un `THREE.ShaderMaterial` personalizado para eliminar el croma (verde) con parámetros de *threshold* y *smoothing*.
+
+*   **Escala Humana**
+: El holograma está calibrado a tamaño real (1,80 m) con una escala de `[1.6, 1.8, 1.6]` y posicionado a 2,5 metros del usuario.
+
+*   **Solución iOS**
+: Se ha implementado un sistema de desbloqueo de audio/video para Safari mediante un botón de inicio (`#show-plano-btn`) que quita el *muted* y hace visible la entidad en 3D.
+
+*   **Interfaz**
+: La UI es de estilo *Glassmorphism* y controla el Play/Pause y Audio enviando comandos directos a la etiqueta `<video>` que alimenta la VideoTexture.
+
+*   **Optimización**
+: Las texturas e imágenes se han optimizado a menos de 240 KB para garantizar fluidez en móviles.
