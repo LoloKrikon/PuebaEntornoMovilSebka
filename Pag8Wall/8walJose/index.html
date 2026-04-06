@@ -60,13 +60,15 @@
       transform: translateX(-50%) scale(0.97);
       box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
     }
+
     /* Panel de controles del holograma */
     #controles-ar {
       position: fixed;
       bottom: 40px;
       right: 20px;
       z-index: 9999;
-      display: none; /* Se activa al empezar */
+      display: none;
+      /* Se activa al empezar */
       gap: 12px;
     }
 
@@ -98,13 +100,7 @@
 
 <body>
   <!-- Elemento de vídeo oculto para el sistema de Jose Manuel -->
-  <video id="video" 
-    src="video1.mp4" 
-    playsinline 
-    webkit-playsinline 
-    muted 
-    crossorigin="anonymous" 
-    loop="false" 
+  <video id="video" src="video1.mp4" playsinline webkit-playsinline muted crossorigin="anonymous" loop="false"
     style="display:none">
   </video>
 
@@ -125,7 +121,7 @@
     const video = document.getElementById('video');
     const panel = document.getElementById('controles-ar');
     const b_inicio = document.getElementById('show-plano-btn');
-    
+
     const b_mute = document.getElementById('btn-mute');
     const b_pause = document.getElementById('btn-pause');
     const b_reset = document.getElementById('btn-reset');
