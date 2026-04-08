@@ -94,7 +94,14 @@
         video.muted = false;
         video.volume = 1;
         video.currentTime = 0;
-        video.play();
+
+        let playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            video.muted = true;
+            video.play();
+          });
+        }
 
         const entity = world.getEntity(planoEid);
         if (entity) {
