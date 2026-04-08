@@ -91,27 +91,21 @@
       };
 
       btn.addEventListener('click', () => {
-        // 1. Play the video FIRST (iOS user-gesture pattern)
         video.muted = false;
         video.volume = 1;
         video.currentTime = 0;
         video.play();
 
-        // 2. Apply video texture to the mesh (while plane is still hidden)
-        const mesh = cachedMesh || findMesh();
-        if (mesh) {
-          applyVideoTexture(mesh);
+        const entity = world.getEntity(planoEid);
+        if (entity) {
+          entity.show();
         }
 
-        // 3. Wait 2 frames so the first video frame renders into the texture,
-        //    THEN show the plane — avoids the black flash
-        const entity = world.getEntity(planoEid);
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (entity) {
-              entity.show();
-            }
-          });
+          const mesh = findMesh();
+          if (mesh) {
+            applyVideoTexture(mesh);
+          }
         });
 
         btn.style.display = 'none';
