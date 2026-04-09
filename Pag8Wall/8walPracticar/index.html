@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>ar_holograma</title>
+
+  <!-- Open Graph / Social Meta -->
+  <meta itemprop="name" content="ar_holograma">
+  <meta name="twitter:title" content="ar_holograma">
+  <meta property="og:title" content="ar_holograma">
+  <meta property="og:site_name" content="ar_holograma">
+
+  <meta name="description" content="ar_holograma.">
+  <meta itemprop="description" content="ar_holograma.">
+  <meta property="og:description" content="ar_holograma.">
+  <meta name="twitter:description" content="ar_holograma.">
+
+  <!-- 8th Wall Scripts -->
+  <script crossorigin="anonymous" src="./external/runtime/runtime.js"></script>
+  <script crossorigin="anonymous" src="./external/xr/xr.js" async="true" data-preload-chunks="face, slam"></script>
+
+  <style>
+    /* Button to show the Plano */
+    #show-plano-btn {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+
+      padding: 14px 36px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+
+      /* Gradient background */
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #ffffff;
+      font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+
+      /* Soft shadow */
+      box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+
+      /* Smooth transitions */
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+    }
+
+    #show-plano-btn:hover {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 8px 28px rgba(0, 114, 255, 0.55);
+    }
+
+    #show-plano-btn:active {
+      transform: translateX(-50%) scale(0.97);
+      box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
+    }
+
+    /* Panel de controles del holograma */
+    #controles-ar {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: none;
+      /* Se activa al empezar */
+      gap: 12px;
+    }
+
+    .btn-ar {
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-ar:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.25);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Elemento de vídeo oculto para el sistema de Jose Manuel -->
+  <video id="video" src="video1.mp4?v=recarga" playsinline webkit-playsinline muted loop="false"
+    style="position: absolute; top: 0; left: -10000px; width: 1px; height: 1px; z-index: -1000;">
+  </video>
+
+  <!-- Button to show the Plano in AR -->
+  <button id="show-plano-btn">Mostrar video</button>
+
+  <!-- Controles interactivos -->
+  <div id="controles-ar">
+    <button id="btn-reset" class="btn-ar">↺</button>
+    <button id="btn-pause" class="btn-ar">⏸</button>
+    <button id="btn-mute" class="btn-ar">🔊</button>
+  </div>
+
+  <script src="bundle.js"></script>
+
+  <script>
+    // Mis controles AR
+    const video = document.getElementById('video');
+    const panel = document.getElementById('controles-ar');
+    const b_inicio = document.getElementById('show-plano-btn');
+
+    const b_mute = document.getElementById('btn-mute');
+    const b_pause = document.getElementById('btn-pause');
+    const b_reset = document.getElementById('btn-reset');
+
+    b_inicio.addEventListener('click', () => {
+      panel.style.display = 'flex';
+      b_mute.innerText = '🔊';
+      b_pause.innerText = '⏸';
+    });
+
+    b_mute.addEventListener('click', () => {
+      video.muted = !video.muted;
+      b_mute.innerText = video.muted ? '🔇' : '🔊';
+    });
+
+    b_pause.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        b_pause.innerText = '⏸';
+      } else {
+        video.pause();
+        b_pause.innerText = '▶';
+      }
+    });
+
+    b_reset.addEventListener('click', () => {
+      video.currentTime = 0;
+      video.play();
+      b_pause.innerText = '⏸';
+    });
+
+    video.addEventListener('ended', () => {
+      panel.style.display = 'none';
+    });
+  </script>
+</body>
+
+</html>
