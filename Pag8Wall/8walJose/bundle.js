@@ -125,6 +125,55 @@
         }
         btn.style.display = '';
       });
+
+      let dragging = false;
+      let dragOffset = new window.THREE.Vector3();
+      const raycaster = new window.THREE.Raycaster();
+      const mouse = new window.THREE.Vector2();
+      const floorPlane = new window.THREE.Plane(new window.THREE.Vector3(0, 1, 0), -1.8);
+
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 1) return;
+        const o3d = world.three.entityToObject.get(planoEid);
+        if (!o3d || o3d.visible === false) return;
+
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, world.three.activeCamera);
+        
+        let m = null;
+        o3d.traverse(c => { if (c.isMesh && !m) m = c; });
+        if (!m) return;
+
+        const res = raycaster.intersectObject(m);
+        if (res.length > 0) {
+          dragging = true;
+          floorPlane.constant = -o3d.position.y;
+          raycaster.ray.intersectPlane(floorPlane, dragOffset);
+          if (dragOffset) dragOffset.sub(o3d.position);
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        const o3d = world.three.entityToObject.get(planoEid);
+        if (!o3d) return;
+
+        mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, world.three.activeCamera);
+
+        let pt = new window.THREE.Vector3();
+        raycaster.ray.intersectPlane(floorPlane, pt);
+        if (pt) {
+            pt.sub(dragOffset);
+            o3d.position.x = pt.x;
+            o3d.position.z = pt.z;
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchend', () => { dragging = false; });
     },
     tick: (world, component) => {
       // Cache the mesh reference so it's ready when the button is clicked
