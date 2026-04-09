@@ -1,97 +1,108 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="utf-8">
-    <title>8th Wall Nativo (Sin A-Frame)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <!-- 1. Cargamos el motor de 3D (Three.js) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r126/examples/js/loaders/GLTFLoader.js"></script>
-
-    <!-- 2. Motor de Realidad Aumentada Autónomo (Sin AppKey) -->
-    <script src="https://cdn.8thwall.com/web/xrextras/xrextras.js"></script>
-    <script async src="engine/xr.js" data-preload-chunks="slam"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipos AR</title>
     <style>
         body {
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1e1e24, #151518);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        canvas {
-            display: block;
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: #888;
+            font-size: 15px;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        /* Botón Proyecto Principal */
+        .btn-primary {
+            background: linear-gradient(135deg, #007aff, #00c6ff);
+            color: white;
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        /* Botón Sandbox / Pruebas */
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ccc;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(1px);
         }
     </style>
 </head>
-
 <body>
-    <!-- Capa de 8th Wall para errores y carga -->
-    <xrextras-loading></xrextras-loading>
+    <div class="container">
+        <h1>Prototipos AR</h1>
+        <p>Selecciona el entorno de Realidad Aumentada al que deseas acceder para probar el despliegue.</p>
 
-    <script>
-        let scene, camera, renderer, castle;
-
-        // Función principal que arranca todo
-        const initAR = () => {
-            // A. Creamos la "Escena" de Three.js (Donde vivirá el castillo)
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000);
-            renderer = new THREE.WebGLRenderer({
-                alpha: true, // Importante: para que se vea la cámara real debajo
-                antialias: true
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            // B. Luces
-            const light = new THREE.DirectionalLight(0xffffff, 1.0);
-            light.position.set(1, 1, 1);
-            scene.add(light);
-            scene.add(new THREE.AmbientLight(0x404040, 2.0));
-
-            // C. Cargamos el Castillo de Constantina
-            const loader = new THREE.GLTFLoader();
-            loader.load('../TodosLosDiseños/TodosGLB/CastilloConstantinaBAKE.glb', (gltf) => {
-                castle = gltf.scene;
-                castle.scale.set(0.05, 0.05, 0.05); // escala pequeña
-                castle.visible = false; // Se oculta hasta que se detecte el suelo
-                scene.add(castle);
-                console.log("Castillo cargado.");
-            });
-
-            // D. Iniciamos 8th Wall (El "Rastreador")
-            XR8.addCameraPipelineModules([
-                XR8.GlTextureRenderer.pipelineModule(),      // Dibuja la cámara real
-                XR8.Threejs.pipelineModule(),                // 8Wall con Three.js
-                XR8.XrController.pipelineModule(),           // El motor de suelo (SLAM)
-                XRExtras.Loading.pipelineModule(),           // Pantalla de carga
-                XRExtras.RuntimeError.pipelineModule(),      // Errores
-            ]);
-
-            // Configuramos qué pasa cada vez que el móvil detecta un movimiento
-            XR8.addCameraPipelineModule({
-                name: 'mi-logica',
-                onUpdate: () => {
-                    // Aquí es donde 8th Wall mueve la cámara de Three.js sola
-                },
-                onStart: () => {
-                    // Cuando se detecte el suelo aparece el modelo
-                    if (castle) castle.visible = true;
-                }
-            });
-
-            XR8.run({ canvas: renderer.domElement });
-        }
-        window.onload = () => {
-            if (window.XR8) {
-                initAR();
-            } else {
-                window.addEventListener('xrloaded', initAR);
-            }
-        };
-    </script>
+        <a href="8walJose/" class="btn btn-primary">Entorno Principal (8walJose)</a>
+        <a href="8walPracticar/" class="btn btn-secondary">Laboratorio Pruebas (8walPracticar)</a>
+    </div>
 </body>
-
 </html>
